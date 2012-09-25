@@ -1,0 +1,75 @@
+import copy
+
+__author__ = 'fmaia'
+import logging
+import MeTGlue
+import MonitorVms
+import monitor_config
+
+class Stats(object):
+
+
+    def __init__(self):
+        self._clusterHBase = []
+        self._stats = {}
+        self._metGlue =  MeTGlue.MeTGlue()
+        self._rserver_longname = {}
+        self._region_metrics = {}
+        self._monVms = MonitorVms.MonitorVms(None)
+        self._metric_filter = ["cpu_idle","cpu_wio","hbase.regionserver.hdfsBlocksLocalityIndex"]
+        self._ALPHA = monitor_config.alpha
+        self.refreshStats(False)
+        logging.info('Stats started.')
+
+
+    def getNumberRegionServers(self):
+        return len(self._clusterHBase)
+
+    def getRegionServers(self):
+        return copy.deepcopy(self._clusterHBase)
+
+    def getRegionServerStats(self,rserver):
+        return copy.deepcopy(self._stats[rserver])
+
+    def getRegionStats(self):
+        return copy.deepcopy(self._region_metrics)
+
+    def refreshStats(self,CYCLE=True):
+
+        self._clusterHBase = []
+        #get new stats
+        ganglia_metrics = self._monVms.refreshMetrics()
+        cluster_metrics = self._metGlue.getRegionServerStats(False)
+        for serverid in cluster_metrics.keys():
+            short = str(serverid).split(',')[0]
+            self._clusterHBase.append(short)
+            self._rserver_longname[short] = serverid
+
+        self._region_metrics = self.metGlue.getRegionStats(False)
+        regionservers = ganglia_metrics.keys()
+
+        #combined stats to process - using alpha smoothing technique
+        for key in regionservers:
+            if key in self._clusterHBase and key in regionservers:
+                if key not in self._stats.keys():
+                    self._stats[key] = {}
+                for kmetric in ganglia_metrics[key].keys():
+                    #print 'METRICA GANGLIA: ',kmetric
+                    if kmetric in self._stats[key].keys() and kmetric in self._metric_filter:
+                        value_ = ganglia_metrics[key][kmetric]
+                        old_value = self._stats[key][kmetric]
+                        self._stats[key][kmetric] = (self._ALPHA*float(value_)) + ((1-self._ALPHA)*float(old_value))
+                    elif kmetric in self._metric_filter:
+                        self._stats[key][kmetric] = ganglia_metrics[key][kmetric]
+
+        for k in cluster_metrics.keys():
+            key = str(k).split(',')[0]
+            tmp_stats = cluster_metrics[k]
+            for subkey in tmp_stats.keys():
+                self._stats[key][subkey] = tmp_stats[subkey]
+
+        if CYCLE:
+            for rserver in self._stats.keys():
+                logging.info(rserver,' cpu_idle:',self._stats[rserver]['cpu_idle']," cpu_wio:",self._stats[rserver]['cpu_wio'])
+
+
