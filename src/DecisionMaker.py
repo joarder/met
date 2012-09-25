@@ -2,6 +2,7 @@ import copy
 import logging
 import math
 import Stats
+import Actuator
 import decisionmaker_config
 
 class DecisionMaker(object):
@@ -12,6 +13,7 @@ class DecisionMaker(object):
         self._machtoadd = 1
         self._reconfigure = True
         self._stats = Stats.Stats()
+        self._actuator = Actuator.Actuator()
         #current state of the system - initially is empty
         self._machine_type = {}
         self._current_config = {}
@@ -305,29 +307,29 @@ class DecisionMaker(object):
                 for item in creadmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'r'
-                    configureServer(physical,'r')
+                    self._actuator.configureServer(physical,'r')
                     result[physical] = readmachines[item]
 
                 for item in cwritemachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'w'
-                    configureServer(physical,'w')
+                    self._actuator.configureServer(physical,'w')
                     result[physical] = writemachines[item]
 
                 for item in cscanmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 's'
-                    configureServer(physical,'s')
+                    self._actuator.configureServer(physical,'s')
                     result[physical] = scanmachines[item]
 
                 for item in crwmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'rw'
-                    configureServer(physical,'rw')
+                    self._actuator.configureServer(physical,'rw')
                     result[physical] = rwmachines[item]
 
                 #MOVE REGIONS INTO PLACE IF NEEDED
-                distributeRegionsPerRS(result)
+                self._actuator.distributeRegionsPerRS(result)
 
             else:
                 #ATTENTION: CURRENTLY NOT CONSIDERING THE CASE WHERE THERE ARE FEWER MACHINES!
@@ -340,38 +342,38 @@ class DecisionMaker(object):
             for item in readmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'r'
-                configureServer(physical,'r',available_machines)
+                self._actuator.configureServer(physical,'r',available_machines)
                 result[physical] = readmachines[item]
                 partialResult[physical] = readmachines[item]
-                distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult)
                 partialResult = {}
 
             for item in writemachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'w'
-                configureServer(physical,'w',available_machines)
+                self._actuator.configureServer(physical,'w',available_machines)
                 result[physical] = writemachines[item]
                 partialResult[physical] = writemachines[item]
-                distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult)
                 partialResult = {}
 
             for item in scanmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 's'
-                configureServer(physical,'s',available_machines)
+                self._actuator.configureServer(physical,'s',available_machines)
                 result[physical] = scanmachines[item]
                 partialResult[physical] = scanmachines[item]
-                distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult)
                 partialResult = {}
 
             for item in rwmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'rw'
-                configureServer(physical,'rw',available_machines)
+                self._actuator.configureServer(physical,'rw',available_machines)
                 result[physical] = rwmachines[item]
                 partialResult[physical] = rwmachines[item]
                 print 'partialResult', partialResult
-                distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult)
                 partialResult = {}
 
 
@@ -409,38 +411,36 @@ class DecisionMaker(object):
         if actionNeeded and self._reconfigure:
             nregionservers = self._stats.getNumberRegionServers()
             regionStats = self._stats.getRegionStats()
-            tagged_machines,tagged_regions = self._tagging(regionStats,nregionservers)
+            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers)
             #going for ASSIGNMENT ALGORITHM
             readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
             #define which physical machine is going to accomodate which config (function 'f')
             self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
             self._reconfigure = False
-#
-#        elif actionNeeded and not _reconfigure:
-#            #CALL TIRAMOLA TO ADD OPENSTACK MACHINES
-#             print 'CALLING TIRAMOLA TO ADD MACHINE!!!!!!',machtoadd
-#            for i in range(0,machtoadd):
-#                tiramolaAddMachine()
-#                #NEED TO REFRESH STATS
-#                regionStats = refreshStats(False)
-#                nregionservers = len(clusterHBase)
-#                #GOING FOR CONFIG WITH NEW MACHINES
-#                tagged_machines,tagged_regions = tagging(regionStats,nregionservers)
-#                #going for ASSIGNMENT ALGORITHM
-#                readmachines,writemachines,scanmachines,rwmachines = minimizemakespan(tagged_machines,tagged_regions)
-#                #define which physical machine is going to accomodate which config (function 'f')
-#                finalRegionDist = getPhysical(regionStats,readmachines,writemachines,scanmachines,rwmachines)
-#                #MOVE REGIONS INTO PLACE IF NEEDED
-#                distributeRegionsPerRS(regionStats,finalRegionDist)
-#
-#        #Update control vars
-#        machtoadd = machtoadd * 2
-#        reconfigure = True
-#
-#        else:
-#            if VERBOSE:
-#                print 'Cluster is healthy.'
-#            machtoadd = 1
+
+        elif actionNeeded and not self._reconfigure:
+            #CALL TIRAMOLA TO ADD OPENSTACK MACHINES
+            logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:',self._machtoadd)
+            for i in range(0,self._machtoadd):
+                self._actuator.tiramolaAddMachine()
+                #NEED TO REFRESH STATS
+                self._stats.refreshStats(False)
+                nregionservers = self._stats.getNumberRegionServers()
+                regionStats = self._stats.getRegionStats()
+                #GOING FOR CONFIG WITH NEW MACHINES
+                tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers)
+                #going for ASSIGNMENT ALGORITHM
+                readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
+                #define which physical machine is going to accomodate which config (function 'f')
+                self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
+
+            #Update control vars
+            self._machtoadd = self._machtoadd * 2
+            self._reconfigure = True
+
+        else:
+            logging.info('Cluster is healthy. Nothing to do.')
+            self._machtoadd = 1
 
 
 
