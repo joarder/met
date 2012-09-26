@@ -32,7 +32,7 @@ def main():
         if (doStuff):
             logging.info('Going to process cluster status.')
 
-            decision_maker.cycle()
+            decision_maker.cycle(False)
 
             doStuff = False
             ran = 0
