@@ -23,7 +23,7 @@ class Actuator(object):
         logging.info('Actuator started.')
 
     def copyToServer(self,host,whereto,filepath):
-        logging.info("Copying files to "+ host)
+        logging.info("Copying files to "+ str(host))
         transport = paramiko.Transport((host, 22))
         tries=0
         while tries<100:
@@ -40,7 +40,7 @@ class Actuator(object):
         splittedpath = filepath.split('/')[-1]
         sftp.put(filepath, whereto+'/'+splittedpath)
         sftp.close()
-        logging.info('File '+filepath+' copied to '+host,'.')
+        logging.info('File '+str(filepath)+' copied to '+str(host)+'.')
 
 
     def configFile(self,template,final,block,memu,meml):
@@ -80,7 +80,7 @@ class Actuator(object):
                         self._metglue.move(region,ser,False)
                     except Exception, err:
                         logging.error('ERROR:'+err)
-                    logging.info('Moving region '+ region+ ' to '+ ser+ ' DONE.')
+                    logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
 
         while(self.isBusy()):
             time.sleep(5)
@@ -93,7 +93,7 @@ class Actuator(object):
 			    for region in machines_to_regions[rserver]:
 				    if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
 					    try:
-						    logging.info('Major compact of: '+region)
+						    logging.info('Major compact of: '+str(region))
 						    self._metglue.majorCompact(region)
 						    time.sleep(2)
 					    except Exception, err:
@@ -123,7 +123,7 @@ class Actuator(object):
             try:
                 ssh.connect(instance.public_dns_name, username=self._USERNAME, password=self._PASSWORD)
             except:
-                logging.error("Unable to connect to node  " + instance.public_dns_name)
+                logging.error("Unable to connect to node  " + str(instance.public_dns_name))
 
             #ADDED THIS TO FIX GANGLIA PROBLEM
             stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor stop')
@@ -144,10 +144,10 @@ class Actuator(object):
             try:
                 transport.connect(username = 'root', password = '123456')
             except:
-                logging.error("Unable to connect to node  " + node)
+                logging.error("Unable to connect to node  " + str(node))
             transport.open_channel("session", node, "localhost")
             sftp = paramiko.SFTPClient.from_transport(transport)
-            logging.info("Sending /etc/hosts to node:  " + node)
+            logging.info("Sending /etc/hosts to node:  " + str(node))
             sftp.put( "/tmp/hosts", "/etc/hosts")
             sftp.close()
 
@@ -157,7 +157,7 @@ class Actuator(object):
             try:
                 ssh.connect(instance.public_dns_name, username='root', password='123456')
             except:
-                logging.error("Unable to connect to node  " + instance.public_dns_name)
+                logging.error("Unable to connect to node  " + str(instance.public_dns_name))
 
             stdin, stdout, stderr = ssh.exec_command('/opt/hadoop-1.0.1/bin/hadoop-daemon.sh start datanode')
             logging.info(str(stdout.readlines()))
@@ -182,7 +182,7 @@ class Actuator(object):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         for clusterkey in self._stats.getRegionServers():
             if not clusterkey.endswith("master"):
-                logging.info("Restarting ganlgia on Slave:"+clusterkey)
+                logging.info("Restarting ganlgia on Slave:"+str(clusterkey))
                 tries=0
                 while tries<10:
                     try:
@@ -190,7 +190,7 @@ class Actuator(object):
                         ssh.connect(clusterkey, username=self._USERNAME, password=self._PASSWORD)
                         break
                     except:
-                        logging.error("Unable to connect to node  " + clusterkey+ " after "+str(tries)+" attempts.")
+                        logging.error("Unable to connect to node  " + str(clusterkey)+ " after "+str(tries)+" attempts.")
                 stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
                 logging.info(str(stdout.readlines()))
                 ssh.close()
@@ -201,4 +201,4 @@ class Actuator(object):
                 logging.info(str(stdout.readlines()))
                 ssh.close()
             except:
-                logging.error("Unable to connect to node  " + instance.public_dns_name)
+                logging.error("Unable to connect to node  " + str(instance.public_dns_name))
