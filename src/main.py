@@ -2,6 +2,7 @@ import logging
 import main_config
 import time
 import DecisionMaker
+import Stats
 
 __author__ = 'fmaia'
 
@@ -18,13 +19,15 @@ def main():
     if main_config.rampup:
         time.sleep(240)
 
-    decision_maker = DecisionMaker.DecisionMaker()
+    stats = Stats.Stats()
+    decision_maker = DecisionMaker.DecisionMaker(stats)
 
     #Main loop
     while(running):
         ran = ran + 1
 
         logging.info('Running cycle '+str(ran))
+        stats.refreshStats(True)
 
         if ran == main_config.nsamples:
             doStuff = True

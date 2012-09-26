@@ -1,7 +1,6 @@
 import copy
 import logging
 import math
-import Stats
 import Actuator
 import decisionmaker_config
 
@@ -9,10 +8,10 @@ class DecisionMaker(object):
 
 
 
-    def __init__(self):
+    def __init__(self,stats):
         self._machtoadd = 1
         self._reconfigure = True
-        self._stats = Stats.Stats()
+        self._stats = stats
         self._actuator = Actuator.Actuator(self._stats)
         #current state of the system - initially is empty
         self._machine_type = {}
