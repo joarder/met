@@ -24,6 +24,9 @@ class Stats(object):
         logging.info('Stats started.')
 
 
+    def getMeTGlue(self):
+        return self._metGlue
+
     def getNumberRegionServers(self):
         return len(self._clusterHBase)
 
@@ -50,7 +53,7 @@ class Stats(object):
             self._clusterHBase.append(short)
             self._rserver_longname[short] = serverid
 
-        self._region_metrics = self.metGlue.getRegionStats(False)
+        self._region_metrics = self._metGlue.getRegionStats(False)
         regionservers = ganglia_metrics.keys()
 
         #combined stats to process - using alpha smoothing technique

@@ -10,7 +10,7 @@ import OpenStackCluster
 class Actuator(object):
 
     def __init__(self,stats):
-        self._metglue = MeTGlue.MeTGlue()
+        self._metglue = stats.getMeTGlue()
         self._stats = stats
         self._eucacluster = OpenStackCluster.OpenStackCluster()
         #Actuator Parameters
