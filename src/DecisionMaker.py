@@ -13,7 +13,7 @@ class DecisionMaker(object):
         self._machtoadd = 1
         self._reconfigure = True
         self._stats = Stats.Stats()
-        self._actuator = Actuator.Actuator()
+        self._actuator = Actuator.Actuator(self._stats)
         #current state of the system - initially is empty
         self._machine_type = {}
         self._current_config = {}
@@ -329,7 +329,7 @@ class DecisionMaker(object):
                     result[physical] = rwmachines[item]
 
                 #MOVE REGIONS INTO PLACE IF NEEDED
-                self._actuator.distributeRegionsPerRS(result)
+                self._actuator.distributeRegionsPerRS(result,self._machine_type)
 
             else:
                 #ATTENTION: CURRENTLY NOT CONSIDERING THE CASE WHERE THERE ARE FEWER MACHINES!
@@ -345,7 +345,7 @@ class DecisionMaker(object):
                 self._actuator.configureServer(physical,'r',available_machines)
                 result[physical] = readmachines[item]
                 partialResult[physical] = readmachines[item]
-                self._actuator.distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 
             for item in writemachines.keys():
@@ -354,7 +354,7 @@ class DecisionMaker(object):
                 self._actuator.configureServer(physical,'w',available_machines)
                 result[physical] = writemachines[item]
                 partialResult[physical] = writemachines[item]
-                self._actuator.distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 
             for item in scanmachines.keys():
@@ -363,7 +363,7 @@ class DecisionMaker(object):
                 self._actuator.configureServer(physical,'s',available_machines)
                 result[physical] = scanmachines[item]
                 partialResult[physical] = scanmachines[item]
-                self._actuator.distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 
             for item in rwmachines.keys():
@@ -373,7 +373,7 @@ class DecisionMaker(object):
                 result[physical] = rwmachines[item]
                 partialResult[physical] = rwmachines[item]
                 print 'partialResult', partialResult
-                self._actuator.distributeRegionsPerRS(partialResult)
+                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 
 

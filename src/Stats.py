@@ -13,9 +13,11 @@ class Stats(object):
         self._clusterHBase = []
         self._stats = {}
         self._metGlue =  MeTGlue.MeTGlue()
+        logging.info('Connected to MeTGlue gateway.')
         self._rserver_longname = {}
         self._region_metrics = {}
         self._monVms = MonitorVms.MonitorVms(None)
+        logging.info('Connected to Ganglia.')
         self._metric_filter = ["cpu_idle","cpu_wio","hbase.regionserver.hdfsBlocksLocalityIndex"]
         self._ALPHA = monitor_config.alpha
         self.refreshStats(False)
@@ -30,6 +32,9 @@ class Stats(object):
 
     def getRegionServerStats(self,rserver):
         return copy.deepcopy(self._stats[rserver])
+
+    def getServerLongNames(self):
+        return copy.deepcopy(self._rserver_longname)
 
     def getRegionStats(self):
         return copy.deepcopy(self._region_metrics)
@@ -54,7 +59,6 @@ class Stats(object):
                 if key not in self._stats.keys():
                     self._stats[key] = {}
                 for kmetric in ganglia_metrics[key].keys():
-                    #print 'METRICA GANGLIA: ',kmetric
                     if kmetric in self._stats[key].keys() and kmetric in self._metric_filter:
                         value_ = ganglia_metrics[key][kmetric]
                         old_value = self._stats[key][kmetric]
