@@ -32,7 +32,7 @@ class DecisionMaker(object):
         res = False
         #condition that evaluates if the RegionServer is overloaded
         if (float(rstats['cpu_idle']) < self._CPU_IDLE_MIN or float(rstats['cpu_wio']) > self._IO_WAIT_MAX):
-            logging.info('cpu_idle:'+rstats['cpu_idle']+" cpu_wio:"+rstats['cpu_wio'])
+            logging.info('cpu_idle:'+str(rstats['cpu_idle'])+" cpu_wio:"+str(rstats['cpu_wio']))
             res = True
         return res
 
@@ -107,8 +107,8 @@ class DecisionMaker(object):
             machines_per_tag_float[tag] = tempvalue
             res_total = res_total + machines_
 
-        logging.info('Number of Regions: '+nregions)
-        logging.info('Machines per tag: '+machines_per_tag)
+        logging.info('Number of Regions: '+str(nregions))
+        logging.info('Machines per tag: '+str(machines_per_tag))
 
         #treat the case where the round function originates errors
         serverdiff = res_total - nregionservers
@@ -217,11 +217,11 @@ class DecisionMaker(object):
         rwmachines, rwcopy = self.assignpertag(rwregions,nrw)
 
         logging.info('ASSIGNMENT:')
-        logging.info('read:'+readmachines)
-        logging.info('write:'+writemachines)
-        logging.info('scan:'+scanmachines)
-        logging.info('rw:'+rwmachines)
-        logging.info('LEFTOVERS:'+'\n'+readcopy+'\n'+writecopy+'\n'+scancopy+'\n'+rwcopy)
+        logging.info('read:'+str(readmachines))
+        logging.info('write:'+str(writemachines))
+        logging.info('scan:'+str(scanmachines))
+        logging.info('rw:'+str(rwmachines))
+        logging.info('LEFTOVERS:'+'\n'+str(readcopy)+'\n'+str(writecopy)+'\n'+str(scancopy)+'\n'+str(rwcopy))
 
         return readmachines,writemachines,scanmachines,rwmachines
 
@@ -265,7 +265,7 @@ class DecisionMaker(object):
                 for item in available_machines:
                     if item not in self._machine_type.keys():
                         newmachines.append(item)
-                logging.info('newmachines:'+newmachines)
+                logging.info('newmachines:'+str(newmachines))
 
                 for item in readmachines.keys():
                     physical = self.getClosest(readmachines[item],'r',cur)
@@ -341,7 +341,7 @@ class DecisionMaker(object):
             for item in readmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'r'
-                self._actuator.configureServer(physical,'r',available_machines)
+                self._actuator.configureServer(physical,'r')
                 result[physical] = readmachines[item]
                 partialResult[physical] = readmachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
@@ -350,7 +350,7 @@ class DecisionMaker(object):
             for item in writemachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'w'
-                self._actuator.configureServer(physical,'w',available_machines)
+                self._actuator.configureServer(physical,'w')
                 result[physical] = writemachines[item]
                 partialResult[physical] = writemachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
@@ -359,7 +359,7 @@ class DecisionMaker(object):
             for item in scanmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 's'
-                self._actuator.configureServer(physical,'s',available_machines)
+                self._actuator.configureServer(physical,'s')
                 result[physical] = scanmachines[item]
                 partialResult[physical] = scanmachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
@@ -368,15 +368,15 @@ class DecisionMaker(object):
             for item in rwmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'rw'
-                self._actuator.configureServer(physical,'rw',available_machines)
+                self._actuator.configureServer(physical,'rw')
                 result[physical] = rwmachines[item]
                 partialResult[physical] = rwmachines[item]
-                logging.info('partialResult:'+partialResult)
+                logging.info('partialResult:'+str(partialResult))
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 
 
-        logging.info('FINAL DISTRIBUTION:'+result)
+        logging.info('FINAL DISTRIBUTION:'+str(result))
         self._current_config = result
         return result
 
@@ -419,7 +419,7 @@ class DecisionMaker(object):
 
         elif actionNeeded and not self._reconfigure:
             #CALL TIRAMOLA TO ADD OPENSTACK MACHINES
-            logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:'+self._machtoadd)
+            logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:'+str(self._machtoadd))
             for i in range(0,self._machtoadd):
                 self._actuator.tiramolaAddMachine()
                 #NEED TO REFRESH STATS

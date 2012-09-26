@@ -24,7 +24,7 @@ def main():
     while(running):
         ran = ran + 1
 
-        logging.info('Running cycle '+ran)
+        logging.info('Running cycle '+str(ran))
 
         if ran == main_config.nsamples:
             doStuff = True
