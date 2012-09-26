@@ -23,7 +23,7 @@ class Actuator(object):
         logging.info('Actuator started.')
 
     def copyToServer(self,host,whereto,filepath):
-        logging.info("Copying files to ", host)
+        logging.info("Copying files to "+ host)
         transport = paramiko.Transport((host, 22))
         tries=0
         while tries<100:
@@ -40,7 +40,7 @@ class Actuator(object):
         splittedpath = filepath.split('/')[-1]
         sftp.put(filepath, whereto+'/'+splittedpath)
         sftp.close()
-        logging.info('File ',filepath,' copied to ',host,'.')
+        logging.info('File '+filepath+' copied to '+host,'.')
 
 
     def configFile(self,template,final,block,memu,meml):
@@ -79,8 +79,8 @@ class Actuator(object):
                     try:
                         self._metglue.move(region,ser,False)
                     except Exception, err:
-                        logging.error('ERROR:',err)
-                    logging.info('Moving region ', region, ' to ', ser, ' DONE.')
+                        logging.error('ERROR:'+err)
+                    logging.info('Moving region '+ region+ ' to '+ ser+ ' DONE.')
 
         while(self.isBusy()):
             time.sleep(5)
@@ -93,11 +93,11 @@ class Actuator(object):
 			    for region in machines_to_regions[rserver]:
 				    if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
 					    try:
-						    logging.info('Major compact of: ',region)
+						    logging.info('Major compact of: '+region)
 						    self._metglue.majorCompact(region)
 						    time.sleep(2)
 					    except Exception, err:
-						    logging.error('ERROR:',err)
+						    logging.error('ERROR:'+err)
 
 
     #ADD MACHINE
@@ -182,7 +182,7 @@ class Actuator(object):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         for clusterkey in self._stats.getRegionServers():
             if not clusterkey.endswith("master"):
-                logging.info("Restarting ganlgia on Slave:",clusterkey)
+                logging.info("Restarting ganlgia on Slave:"+clusterkey)
                 tries=0
                 while tries<10:
                     try:

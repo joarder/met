@@ -77,6 +77,6 @@ class Stats(object):
 
         if CYCLE:
             for rserver in self._stats.keys():
-                logging.info(rserver,' cpu_idle:',self._stats[rserver]['cpu_idle']," cpu_wio:",self._stats[rserver]['cpu_wio'])
+                logging.info(rserver+' cpu_idle:'+self._stats[rserver]['cpu_idle']+" cpu_wio:"+self._stats[rserver]['cpu_wio'])
 
 

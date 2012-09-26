@@ -32,7 +32,7 @@ class DecisionMaker(object):
         res = False
         #condition that evaluates if the RegionServer is overloaded
         if (float(rstats['cpu_idle']) < self._CPU_IDLE_MIN or float(rstats['cpu_wio']) > self._IO_WAIT_MAX):
-            logging.info('cpu_idle:',rstats['cpu_idle']," cpu_wio:",rstats['cpu_wio'])
+            logging.info('cpu_idle:'+rstats['cpu_idle']+" cpu_wio:"+rstats['cpu_wio'])
             res = True
         return res
 
@@ -107,8 +107,8 @@ class DecisionMaker(object):
             machines_per_tag_float[tag] = tempvalue
             res_total = res_total + machines_
 
-        logging.info('Number of Regions:',nregions)
-        logging.info('Machines per tag:',machines_per_tag)
+        logging.info('Number of Regions: '+nregions)
+        logging.info('Machines per tag: '+machines_per_tag)
 
         #treat the case where the round function originates errors
         serverdiff = res_total - nregionservers
@@ -124,7 +124,6 @@ class DecisionMaker(object):
                 machines_per_tag[min_tag] = machines_per_tag[min_tag]-1
             else:
                 for i in range(0,int(serverdiff)):
-                    print flagged
                     tagtouse = flagged.pop()
                     if machines_per_tag[tagtouse]>0:
                         machines_per_tag[tagtouse] = machines_per_tag[tagtouse]-1
@@ -149,7 +148,7 @@ class DecisionMaker(object):
 
             #REGIONS ASSIGNMENT
             tmpmachines = copy.deepcopy(assignment.keys())
-            #print 'initmachines:', tmpmachines
+
 
             while (len(regions)>0):
 
@@ -218,11 +217,11 @@ class DecisionMaker(object):
         rwmachines, rwcopy = self.assignpertag(rwregions,nrw)
 
         logging.info('ASSIGNMENT:')
-        logging.info('read:',readmachines)
-        logging.info('write:',writemachines)
-        logging.info('scan:',scanmachines)
-        logging.info('rw:',rwmachines)
-        logging.info('LEFTOVERS:',readcopy,writecopy,scancopy,rwcopy)
+        logging.info('read:'+readmachines)
+        logging.info('write:'+writemachines)
+        logging.info('scan:'+scanmachines)
+        logging.info('rw:'+rwmachines)
+        logging.info('LEFTOVERS:'+'\n'+readcopy+'\n'+writecopy+'\n'+scancopy+'\n'+rwcopy)
 
         return readmachines,writemachines,scanmachines,rwmachines
 
@@ -266,7 +265,7 @@ class DecisionMaker(object):
                 for item in available_machines:
                     if item not in self._machine_type.keys():
                         newmachines.append(item)
-                print newmachines
+                logging.info('newmachines:'+newmachines)
 
                 for item in readmachines.keys():
                     physical = self.getClosest(readmachines[item],'r',cur)
@@ -372,12 +371,12 @@ class DecisionMaker(object):
                 self._actuator.configureServer(physical,'rw',available_machines)
                 result[physical] = rwmachines[item]
                 partialResult[physical] = rwmachines[item]
-                print 'partialResult', partialResult
+                logging.info('partialResult:'+partialResult)
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 
 
-        logging.info('FINAL DISTRIBUTION:' ,result)
+        logging.info('FINAL DISTRIBUTION:'+result)
         self._current_config = result
         return result
 
@@ -396,7 +395,7 @@ class DecisionMaker(object):
         #check if any of the regionServers is dying
         for rsKey in regionServerList:
             dying = self.isRegionServerDying(self._stats.getRegionServerStats(rsKey))
-            logging.info(rsKey," is dying? ",dying)
+            logging.info(rsKey+' '+" is dying? "+' '+dying)
             if dying:
                 machdying = machdying + 1
                 actionNeeded = True
@@ -420,7 +419,7 @@ class DecisionMaker(object):
 
         elif actionNeeded and not self._reconfigure:
             #CALL TIRAMOLA TO ADD OPENSTACK MACHINES
-            logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:',self._machtoadd)
+            logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:'+self._machtoadd)
             for i in range(0,self._machtoadd):
                 self._actuator.tiramolaAddMachine()
                 #NEED TO REFRESH STATS

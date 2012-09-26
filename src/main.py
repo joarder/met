@@ -24,7 +24,7 @@ def main():
     while(running):
         ran = ran + 1
 
-        logging.info('Running cycle ',ran)
+        logging.info('Running cycle '+ran)
 
         if ran == main_config.nsamples:
             doStuff = True
@@ -36,7 +36,7 @@ def main():
 
             doStuff = False
             ran = 0
-            print 'Finished cycle.'
+            logging.info('Finished cycle.')
 
         time.sleep(main_config.sleeptime)
         runs = runs - 1
@@ -48,9 +48,9 @@ def main():
 
 if __name__ == '__main__':
 
-    logging.basicConfig(filename='met.log', level=logging.INFO)
+    logging.basicConfig(format='%(asctime)s %(message)s',filename='met.log', level=logging.INFO)
     logging.info('Started')
 
-    print 'Starting MeT.'
+    logging.info('Starting MeT.')
 
     main()
