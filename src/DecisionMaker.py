@@ -395,7 +395,7 @@ class DecisionMaker(object):
         #check if any of the regionServers is dying
         for rsKey in regionServerList:
             dying = self.isRegionServerDying(self._stats.getRegionServerStats(rsKey))
-            logging.info(rsKey+' '+" is dying? "+' '+dying)
+            logging.info(rsKey+' '+" is dying? "+' '+str(dying))
             if dying:
                 machdying = machdying + 1
                 actionNeeded = True
