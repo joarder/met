@@ -37,7 +37,7 @@ class Stats(object):
         return copy.deepcopy(self._stats[rserver])
 
     def getServerLongNames(self):
-        return copy.deepcopy(self._rserver_longname)
+        return self._rserver_longname
 
     def getRegionStats(self):
         return copy.deepcopy(self._region_metrics)
