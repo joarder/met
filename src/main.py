@@ -1,4 +1,7 @@
 import logging
+import main_config
+import time
+import DecisionMaker
 
 __author__ = 'fmaia'
 
@@ -7,50 +10,47 @@ def main():
     #main loop on/off
     running = True
     #main loop number of runs
-    runs = NUMBER_OF_RUNS
+    runs = main_config.nloop
     ran = 0
     doStuff = False
 
     #RAMP UP
-    if RAMPUP:
+    if main_config.rampup:
         time.sleep(240)
+
+    decision_maker = DecisionMaker.DecisionMaker()
+
     #Main loop
     while(running):
         ran = ran + 1
-        if VERBOSE:
-            print 'ran: ',ran
 
-        region_metrics = refreshStats()
+        logging.info('Running cycle ',ran)
 
-        if ran == NUMBER_OF_SAMPLES:
+        if ran == main_config.nsamples:
             doStuff = True
 
         if (doStuff):
-            if VERBOSE:
-                print 'Process!'
+            logging.info('Going to process cluster status.')
 
-            #process statistics
-            process(region_metrics)
-            #reset statistics
-            stats = {}
-            #mark as processed
+            decision_maker.cycle()
+
             doStuff = False
             ran = 0
-            print 'Finished processing.'
+            print 'Finished cycle.'
 
-        time.sleep(LOOP_INTERVAL)
+        time.sleep(main_config.sleeptime)
         runs = runs - 1
+
         if runs == 0:
             running = False
 
-    print 'ENDED.'
+    logging.info('EXITED.')
 
 if __name__ == '__main__':
 
     logging.basicConfig(filename='met.log', level=logging.INFO)
     logging.info('Started')
 
-
-    print 'Starting.'
+    print 'Starting MeT.'
 
     main()
