@@ -220,7 +220,7 @@ class DecisionMaker(object):
         logging.info('write:'+str(writemachines))
         logging.info('scan:'+str(scanmachines))
         logging.info('rw:'+str(rwmachines))
-        logging.info('LEFTOVERS:'+'\n'+str(readcopy)+'\n'+str(writecopy)+'\n'+str(scancopy)+'\n'+str(rwcopy))
+        logging.info('LEFTOVERS:'+str(readcopy)+' '+str(writecopy)+' '+str(scancopy)+' '+str(rwcopy))
 
         return readmachines,writemachines,scanmachines,rwmachines
 
