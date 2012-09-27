@@ -154,6 +154,9 @@ class DecisionMaker(object):
 
                 logging.info('len(regions):'+str(len(regions)))
                 region,req = regions.pop()
+                logging.info('tmpMachine:'+str(tmpmachines))
+                logging.info('assigning region:'+str(region))
+
                 binmostempty = (None,None)
                 for machine in tmpmachines:
                     if binmostempty[0] == None:
