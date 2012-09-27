@@ -45,6 +45,13 @@ class Stats(object):
     def getRegionStats(self):
         return copy.deepcopy(self._region_metrics)
 
+    def resetStats(self):
+        self._clusterHBase = []
+        self._stats = {}
+        self._rserver_longname = {}
+        self._region_metrics = {}
+
+
     def refreshStats(self,CYCLE=True):
 
         self._clusterHBase = []
@@ -81,4 +88,5 @@ class Stats(object):
         if CYCLE:
             for rserver in self._stats.keys():
                 logging.info(rserver+' cpu_idle:'+str(self._stats[rserver]['cpu_idle'])+" cpu_wio:"+str(self._stats[rserver]['cpu_wio'])+" locality:"+str(self._stats[rserver]['hbase.regionserver.hdfsBlocksLocalityIndex']))
-
+        else:
+            logging.info('Stats refreshed. Servers: '+str(self._clusterHBase))

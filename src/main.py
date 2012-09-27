@@ -39,7 +39,8 @@ def main():
 
             doStuff = False
             ran = 0
-            logging.info('Finished cycle.')
+            stats.resetStats()
+            logging.info('Finished round.')
 
         time.sleep(main_config.sleeptime)
         runs = runs - 1
