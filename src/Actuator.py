@@ -31,7 +31,7 @@ class Actuator(object):
                 transport.connect(username = self._USERNAME, password = self._PASSWORD)
                 break
             except:
-                print ("Unable to connect to node  " + host+ " after "+str(tries)+" attempts.")
+                print ("Unable to connect to node  " + str(host)+ " after "+str(tries)+" attempts.")
                 time.sleep(5)
 
         transport.open_channel("session", host, "localhost")
@@ -122,13 +122,13 @@ class Actuator(object):
             else:
                 #the case when is the last regionserver
                 try:
-                    temh = self._stats.getRegionServers()[i%len(self._stats.getNumberRegionServers())]
+                    temh = self._stats.getRegionServers()[i%self._stats.getNumberRegionServers()]
                     if temh != server:
                         temporaryHolder = temh
                         i += 1
                     else:
                         i += 1
-                        temh = self._stats.getRegionServers()[i%len(self._stats.getNumberRegionServers())]
+                        temh = self._stats.getRegionServers()[i%self._stats.getNumberRegionServers()]
                         temporaryHolder = temh
                         i += 1
                     if not regionn.startswith('-ROOT') and not regionn.startswith('.META'):
