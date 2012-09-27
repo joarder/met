@@ -1,6 +1,7 @@
 import copy
 import logging
 import math
+import time
 import Actuator
 import decisionmaker_config
 
@@ -440,5 +441,8 @@ class DecisionMaker(object):
             logging.info('Cluster is healthy. Nothing to do.')
             self._machtoadd = 1
 
-
+        for reg in self._stats.getRegionServers():
+            while(self._actuator.isBusyCompacting(reg)):
+                logging.info('Waiting for major compact to finish in '+str(reg))
+                time.sleep(2)
 

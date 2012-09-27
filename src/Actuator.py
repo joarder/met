@@ -46,6 +46,10 @@ class Actuator(object):
         os.system("sed 's/BLOCKCACHESIZE/"+str(block)+"/g; s/GLOBALMEMSTOTEUPPERLIMIT/"+str(memu)+"/g; s/GLOBALMEMSTORELOWERLIMT/"+str(meml)+"/g' " + template + " > " + final)
         print 'File ',template,' configured with block:',str(block),' memu:',str(memu),' meml:',str(meml)
 
+    def isBusyCompacting(self,server):
+        x = os.popen("curl \"http://"+server+":60030/rs-status\"").read()
+        return "RUNNING" in x
+
     def isBusy(self):
         x = os.popen("curl \"http://"+self._MASTER+":60010/master-status\"").read()
         return not "No regions in transition." in x
