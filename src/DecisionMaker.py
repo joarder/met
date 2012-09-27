@@ -443,6 +443,6 @@ class DecisionMaker(object):
 
         for reg in self._stats.getRegionServers():
             while(self._actuator.isBusyCompacting(reg)):
-                logging.info('Waiting for major compact to finish in '+str(reg))
-                time.sleep(2)
+                logging.info('Waiting for major compact to finish in '+str(reg)+'...')
+                time.sleep(10)
 
