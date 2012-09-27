@@ -170,7 +170,7 @@ class OpenStackCluster(object):
 		print e.message
 	    try:
 		image = filter(lambda x:x.name=='met-nsdi-ganglia',nt.images.list())[0]
-		flavor = filter(lambda x:x.id=='6',nt.flavors.list())[0]
+		flavor = filter(lambda x:x.id=='11',nt.flavors.list())[0]
 		print image,flavor
 		new_instance = nt.servers.create(image=image, flavor=flavor, name=keyname,
 		    #min_count=min_count,max_count=max_count,
