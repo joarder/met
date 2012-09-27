@@ -152,10 +152,7 @@ class DecisionMaker(object):
 
             while (len(regions)>0):
 
-                logging.info('len(regions):'+str(len(regions)))
                 region,req = regions.pop()
-                logging.info('tmpMachine:'+str(tmpmachines))
-                logging.info('assigning region:'+str(region))
 
                 binmostempty = (None,None)
                 for machine in tmpmachines:
@@ -163,8 +160,6 @@ class DecisionMaker(object):
                         binmostempty = (machine,assignment[machine]['load'])
                     if (binmostempty[1] > assignment[machine]['load']):
                         binmostempty = (machine,assignment[machine]['load'])
-                logging.info('binmostempty = '+str(binmostempty))
-                logging.info('assignment = ' + str(assignment))
                 if assignment[binmostempty[0]]['len'] < rmax:
                     assignment[binmostempty[0]][region]=req
                     assignment[binmostempty[0]]['load'] = assignment[binmostempty[0]]['load'] + req
