@@ -144,7 +144,7 @@ class DecisionMaker(object):
                 assignment[i]['load'] = 0
                 assignment[i]['len'] = 0
 
-            rmax = int(math.ceil(len(regions) / nmachines))
+            rmax = int(math.ceil(len(regions) / (nmachines+0.0)))
 
             #REGIONS ASSIGNMENT
             tmpmachines = copy.deepcopy(assignment.keys())
