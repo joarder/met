@@ -39,6 +39,9 @@ class Stats(object):
     def getServerLongNames(self):
         return self._rserver_longname
 
+    def getServerLongName(self,server):
+        return self._rserver_longname[server]
+
     def getRegionStats(self):
         return copy.deepcopy(self._region_metrics)
 
@@ -77,6 +80,5 @@ class Stats(object):
 
         if CYCLE:
             for rserver in self._stats.keys():
-                logging.info(rserver+' cpu_idle:'+str(self._stats[rserver]['cpu_idle'])+" cpu_wio:"+str(self._stats[rserver]['cpu_wio']))
-
+                logging.info(rserver+' cpu_idle:'+str(self._stats[rserver]['cpu_idle'])+" cpu_wio:"+str(self._stats[rserver]['cpu_wio'])+" locality:"+str(self._stats[rserver]['hbase.regionserver.hdfsBlocksLocalityIndex']))
 

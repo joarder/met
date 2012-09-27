@@ -30,7 +30,7 @@ class DecisionMaker(object):
     def isRegionServerDying(self,rstats):
         res = False
         #condition that evaluates if the RegionServer is overloaded
-        if (float(rstats['cpu_idle']) < self._CPU_IDLE_MIN or float(rstats['cpu_wio']) > self._IO_WAIT_MAX):
+        if float(rstats['cpu_idle']) < self._CPU_IDLE_MIN or float(rstats['cpu_wio']) > self._IO_WAIT_MAX:
             logging.info('cpu_idle:'+str(rstats['cpu_idle'])+" cpu_wio:"+str(rstats['cpu_wio']))
             res = True
         return res
@@ -111,7 +111,7 @@ class DecisionMaker(object):
 
         #treat the case where the round function originates errors
         serverdiff = res_total - nregionservers
-        if(serverdiff>0):
+        if serverdiff>0 :
             #need to remove machines
             if not flagged:
                 min_perc = machines_per_tag_float['rw']
@@ -127,7 +127,7 @@ class DecisionMaker(object):
                     if machines_per_tag[tagtouse]>0:
                         machines_per_tag[tagtouse] = machines_per_tag[tagtouse]-1
 
-        elif(serverdiff<0):
+        elif serverdiff<0 :
             #need to add machines
             machines_per_tag['rw'] = machines_per_tag['rw'] + abs(serverdiff)
 
@@ -340,7 +340,7 @@ class DecisionMaker(object):
             for item in readmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'r'
-                self._actuator.configureServer(physical,'r')
+                self._actuator.configureServer(physical,'r',available_machines)
                 result[physical] = readmachines[item]
                 partialResult[physical] = readmachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
@@ -349,7 +349,7 @@ class DecisionMaker(object):
             for item in writemachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'w'
-                self._actuator.configureServer(physical,'w')
+                self._actuator.configureServer(physical,'w',available_machines)
                 result[physical] = writemachines[item]
                 partialResult[physical] = writemachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
@@ -358,7 +358,7 @@ class DecisionMaker(object):
             for item in scanmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 's'
-                self._actuator.configureServer(physical,'s')
+                self._actuator.configureServer(physical,'s',available_machines)
                 result[physical] = scanmachines[item]
                 partialResult[physical] = scanmachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
@@ -367,7 +367,7 @@ class DecisionMaker(object):
             for item in rwmachines.keys():
                 physical = available_machines.pop()
                 self._machine_type[physical] = 'rw'
-                self._actuator.configureServer(physical,'rw')
+                self._actuator.configureServer(physical,'rw',available_machines)
                 result[physical] = rwmachines[item]
                 partialResult[physical] = rwmachines[item]
                 logging.info('partialResult:'+str(partialResult))

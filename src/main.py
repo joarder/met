@@ -23,16 +23,16 @@ def main():
     decision_maker = DecisionMaker.DecisionMaker(stats)
 
     #Main loop
-    while(running):
+    while running:
         ran = ran + 1
 
-        logging.info('Running cycle '+str(ran))
+        logging.info('Running cycle %s' % str(ran))
         stats.refreshStats(True)
 
         if ran == main_config.nsamples:
             doStuff = True
 
-        if (doStuff):
+        if doStuff:
             logging.info('Going to process cluster status.')
 
             decision_maker.cycle(False)
