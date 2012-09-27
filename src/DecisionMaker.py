@@ -152,6 +152,7 @@ class DecisionMaker(object):
 
             while (len(regions)>0):
 
+                logging.info('len(regions):'+str(len(regions)))
                 region,req = regions.pop()
                 binmostempty = (None,None)
                 for machine in tmpmachines:
