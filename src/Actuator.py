@@ -5,6 +5,7 @@ import os
 import paramiko
 import time
 import OpenStackCluster
+import operator
 
 class Actuator(object):
 
@@ -179,15 +180,24 @@ class Actuator(object):
             rserver_stats = self._stats.getRegionServerStats(rserver)
             locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
             logging.info('Server '+str(rserver)+' has locality of:'+str(locality))
+
             if (int(locality) < 70 and machine_type[rserver]=="w") or (int(locality) < 90 and machine_type[rserver]!="w"):
-                for region in machines_to_regions[rserver]:
-                    if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
+                #major_compact first the hotspot regions
+                sorted_regions = sorted(machines_to_regions[rserver].iteritems(), key=operator.itemgetter(1))
+                sorted_regions.reverse()
+                #for region in machines_to_regions[rserver]:
+                for a in sorted_regions:
+                    region = a[0]
+                    #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
+                    if not region.startswith('load') and not region.startswith('len'):
                         try:
                             logging.info('Major compact of: '+str(region))
                             self._metglue.majorCompact(region)
                             time.sleep(2)
                         except Exception, err:
                             logging.error('ERROR:'+str(err))
+                #if major_compact then wait a while to get there faster
+                time.sleep(20)
 
 
     #ADD MACHINE
