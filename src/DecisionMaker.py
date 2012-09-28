@@ -107,8 +107,7 @@ class DecisionMaker(object):
             machines_per_tag_float[tag] = tempvalue
             res_total = res_total + machines_
 
-        logging.info('Number of Regions: '+str(nregions))
-        logging.info('Machines per tag: '+str(machines_per_tag))
+
 
         #treat the case where the round function originates errors
         serverdiff = res_total - nregionservers
@@ -131,6 +130,10 @@ class DecisionMaker(object):
         elif serverdiff<0 :
             #need to add machines
             machines_per_tag['rw'] = machines_per_tag['rw'] + abs(serverdiff)
+
+        logging.info('Number of Regions: '+str(nregions))
+        logging.info('Number of RegionServers: '+str(nregionservers))
+        logging.info('Machines per tag: '+str(machines_per_tag))
 
         return machines_per_tag,regionTags
 
