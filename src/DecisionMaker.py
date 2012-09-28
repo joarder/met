@@ -420,26 +420,27 @@ class DecisionMaker(object):
         elif actionNeeded and not self._reconfigure:
             #CALL TIRAMOLA TO ADD OPENSTACK MACHINES
             logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:'+str(self._machtoadd))
-            for i in range(0,self._machtoadd):
-                self._actuator.tiramolaAddMachine()
-                #NEED TO REFRESH STATS
-                self._stats.refreshStats(False)
-                nregionservers = self._stats.getNumberRegionServers()
-                regionStats = self._stats.getRegionStats()
-                #GOING FOR CONFIG WITH NEW MACHINES
-                tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers)
-                #going for ASSIGNMENT ALGORITHM
-                readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
-                #define which physical machine is going to accomodate which config (function 'f')
-                self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
+            #for i in range(0,self._machtoadd):
+            self._actuator.tiramolaAddMachine(self._machtoadd)
+            #NEED TO REFRESH STATS
+            self._stats.refreshStats(False)
+            nregionservers = self._stats.getNumberRegionServers()
+            regionStats = self._stats.getRegionStats()
+            #GOING FOR CONFIG WITH NEW MACHINES
+            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers)
+            #going for ASSIGNMENT ALGORITHM
+            readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
+            #define which physical machine is going to accomodate which config (function 'f')
+            self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
 
             #Update control vars
             self._machtoadd = self._machtoadd * 2
-            self._reconfigure = True
+            self._reconfigure = False
 
         else:
             logging.info('Cluster is healthy. Nothing to do.')
             self._machtoadd = 1
+            self._reconfigure = True
 
         for reg in self._stats.getRegionServers():
             while(self._actuator.isBusyCompacting(reg)):

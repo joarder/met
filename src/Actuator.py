@@ -179,7 +179,7 @@ class Actuator(object):
             rserver_stats = self._stats.getRegionServerStats(rserver)
             locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
             logging.info('Server '+str(rserver)+' has locality of:'+str(locality))
-            if (locality < '70' and machine_type[rserver]=="w") or (locality < '90' and machine_type[rserver]!="w"):
+            if (int(locality) < 70 and machine_type[rserver]=="w") or (int(locality) < 90 and machine_type[rserver]!="w"):
                 for region in machines_to_regions[rserver]:
                     if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
                         try:
@@ -191,7 +191,7 @@ class Actuator(object):
 
 
     #ADD MACHINE
-    def tiramolaAddMachine(self):
+    def tiramolaAddMachine(self, machtoadd):
 
         ssh = paramiko.SSHClient()
         ssh.load_system_host_keys()
@@ -205,7 +205,7 @@ class Actuator(object):
                 if num > maxID:
                     maxID=num
         name="region"+str(maxID+1)
-        instances = self._eucacluster.run_instances(" ", name, None, None, 1, 1, None)
+        instances = self._eucacluster.run_instances(" ", name, None, None, machtoadd, machtoadd, None)
         logging.info("Launched new instance: " + str(instances))
         mInstances = self._eucacluster.block_until_running(instances)
         for instance in mInstances:
