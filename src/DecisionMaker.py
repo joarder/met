@@ -341,14 +341,6 @@ class DecisionMaker(object):
             #FIRST RECONFIGURATION
             logging.info('Current state empty. First reconfig.')
 
-            for item in readmachines.keys():
-                physical = available_machines.pop()
-                self._machine_type[physical] = 'r'
-                self._actuator.configureServer(physical,'r',available_machines)
-                result[physical] = readmachines[item]
-                partialResult[physical] = readmachines[item]
-                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
-                partialResult = {}
 
             for item in scanmachines.keys():
                 physical = available_machines.pop()
@@ -356,6 +348,15 @@ class DecisionMaker(object):
                 self._actuator.configureServer(physical,'s',available_machines)
                 result[physical] = scanmachines[item]
                 partialResult[physical] = scanmachines[item]
+                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
+                partialResult = {}
+
+            for item in readmachines.keys():
+                physical = available_machines.pop()
+                self._machine_type[physical] = 'r'
+                self._actuator.configureServer(physical,'r',available_machines)
+                result[physical] = readmachines[item]
+                partialResult[physical] = readmachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 

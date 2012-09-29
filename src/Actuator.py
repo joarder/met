@@ -197,7 +197,7 @@ class Actuator(object):
                         except Exception, err:
                             logging.error('ERROR:'+str(err))
                 #if major_compact then wait a while to get there faster
-                time.sleep(20)
+                time.sleep(30)
 
 
     #ADD MACHINE
