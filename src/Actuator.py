@@ -6,7 +6,7 @@ import paramiko
 import time
 import OpenStackCluster
 import operator
-import Queue
+from Queue import Queue
 from threading import Thread
 
 class Actuator(object):
