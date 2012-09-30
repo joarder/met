@@ -184,7 +184,7 @@ class Actuator(object):
             time.sleep(5)
 
         logging.info('machine_to_regions:'+str(machines_to_regions))
-        logging.info('machine_type:'+str(machines_type))
+        logging.info('machine_type:'+str(machine_type))
         machines_to_regions.update({'machine_type':machine_type})
         logging.info('machine_to_regions2:'+str(machines_to_regions))
         logging.info('Putting in queue:'+str(machines_to_regions.update({'machine_type':machine_type})))
