@@ -351,6 +351,7 @@ class Actuator(object):
             toCompact = queue.get(True,None)
 
             self._stats.refreshStats(False)
+            logging.info('toCompact inThread:'+str(toCompact))
             machine_type = toCompact.pop('machine_type')
             machines_to_regions = toCompact
 
