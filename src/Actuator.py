@@ -183,6 +183,7 @@ class Actuator(object):
         while(self.isBusy()):
             time.sleep(5)
 
+        logging.info('Putting in queue:'+str(machines_to_regions.update({'machine_type':machine_type})))
         self.queue.put(machines_to_regions.update({'machine_type':machine_type}))
 #        self._stats.refreshStats(False)
 #        for rserver in machines_to_regions:
@@ -351,7 +352,7 @@ class Actuator(object):
             toCompact = queue.get(True,None)
 
             self._stats.refreshStats(False)
-            logging.info('toCompact inThread:'+str(toCompact))
+            logging.info('Thread getting from queue:'+str(toCompact))
             machine_type = toCompact.pop('machine_type')
             machines_to_regions = toCompact
 
