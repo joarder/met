@@ -347,6 +347,7 @@ class Actuator(object):
 
     def major_compact(self,queue):
         while True:
+            logging.info('Major_compact thread started.')
             toCompact = queue.get(True,None)
 
             self._stats.refreshStats(False)
