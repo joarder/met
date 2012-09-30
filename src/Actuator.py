@@ -6,7 +6,7 @@ import paramiko
 import time
 import OpenStackCluster
 import operator
-import queue
+import Queue
 from threading import Thread
 
 class Actuator(object):
@@ -23,8 +23,8 @@ class Actuator(object):
         self._PASSWORD = actuator_config.password
         self._MASTER = actuator_config.master
         #queue for major compaction
-        self.queue = queue()
-        thread = Thread(target=major_compact, args=(queue,))
+        self.queue = Queue()
+        thread = Thread(target=major_compact, args=(self.queue,))
         thread.setDaemon(True)
         thread.start()
         logging.info('Actuator started.')
