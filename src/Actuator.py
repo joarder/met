@@ -188,7 +188,7 @@ class Actuator(object):
         machines_to_regions.update({'machine_type':machine_type})
         logging.info('machine_to_regions2:'+str(machines_to_regions))
         logging.info('Putting in queue:'+str(machines_to_regions.update({'machine_type':machine_type})))
-        self.queue.put(machines_to_regions.update({'machine_type':machine_type}))
+        self.queue.put(machines_to_regions)
 #        self._stats.refreshStats(False)
 #        for rserver in machines_to_regions:
 #            rserver_stats = self._stats.getRegionServerStats(rserver)
