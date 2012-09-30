@@ -183,7 +183,7 @@ class Actuator(object):
         while(self.isBusy()):
             time.sleep(5)
 
-        queue.put(machines_to_regions.update({'machine_type':machine_type}))
+        self.queue.put(machines_to_regions.update({'machine_type':machine_type}))
 #        self._stats.refreshStats(False)
 #        for rserver in machines_to_regions:
 #            rserver_stats = self._stats.getRegionServerStats(rserver)
