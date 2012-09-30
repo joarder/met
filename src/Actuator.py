@@ -24,7 +24,7 @@ class Actuator(object):
         self._MASTER = actuator_config.master
         #queue for major compaction
         self.queue = Queue()
-        thread = Thread(target=major_compact, args=(self.queue,))
+        thread = Thread(target=self.major_compact, args=(self.queue,))
         thread.setDaemon(True)
         thread.start()
         logging.info('Actuator started.')
