@@ -385,7 +385,7 @@ class DecisionMaker(object):
                 partialResultConc.update(partialResult)
                 partialResult = {}
 
-            self._actuator.majorCompact(partialResultConc,self._machine_type)
+            #self._actuator.majorCompact(partialResultConc,self._machine_type)
 
 
         logging.info('FINAL DISTRIBUTION:'+str(result))
