@@ -33,11 +33,11 @@ class Actuator(object):
 
     def copyToServer(self,host,whereto,filepath):
         logging.info("Copying files to "+ str(host))
-        transport = paramiko.Transport((host, 22))
         tries=0
         while tries<100:
             try:
                 tries+=1
+                transport = paramiko.Transport((host, 22))
                 transport.connect(username = self._USERNAME, password = self._PASSWORD)
                 transport.open_channel("session", host, "localhost")
                 sftp = paramiko.SFTPClient.from_transport(transport)
