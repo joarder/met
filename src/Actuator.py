@@ -59,7 +59,7 @@ class Actuator(object):
     def isBusyCompactingFinal(self):
         if self.queue.empty:
             for reg in self._stats.getRegionServers():
-                return self._actuator.isBusyCompacting(reg)
+                return self.isBusyCompacting(reg)
         else:
             return True
 
@@ -184,7 +184,8 @@ class Actuator(object):
                     ser = longServerNames[rserver]
                     try:
                         self._metglue.move(region,ser,False)
-                        time.sleep(2)
+                        while(self.isBusy()):
+                            time.sleep(2)
                     except Exception, err:
                         logging.error('ERROR:'+str(err))
                     logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
@@ -196,7 +197,7 @@ class Actuator(object):
         logging.info('machine_type:'+str(machine_type))
         machines_to_regions.update({'machine_type':machine_type})
         logging.info('machine_to_regions2:'+str(machines_to_regions))
-        logging.info('Putting in queue:'+str(machines_to_regions.update({'machine_type':machine_type})))
+        logging.info('Putting in queue:')
         self.queue.put(machines_to_regions)
 #        self._stats.refreshStats(False)
 #        for rserver in machines_to_regions:
