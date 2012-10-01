@@ -24,9 +24,11 @@ class Actuator(object):
         self._MASTER = actuator_config.master
         #queue for major compaction
         self.queue = Queue()
-        thread = Thread(target=self.major_compact, args=(self.queue,))
-        thread.setDaemon(True)
-        thread.start()
+        #Two threads for major compacting meaning two simultaneous major compacts in the cluster
+        for i in range(1, 2):
+            thread = Thread(target=self.major_compact, args=(i,self.queue,))
+            thread.setDaemon(True)
+            thread.start()
         logging.info('Actuator started.')
 
     def copyToServer(self,host,whereto,filepath):
@@ -271,16 +273,16 @@ class Actuator(object):
                 logging.error("Unable to connect to node  " + str(instance.public_dns_name))
 
             #ADDED THIS TO FIX GANGLIA PROBLEM
-            stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor stop')
-            logging.info(str(stdout.readlines()))
+            #stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor stop')
+            #logging.info(str(stdout.readlines()))
 
             stdin, stdout, stderr = ssh.exec_command('echo \"'+instance.name+"\" > /etc/hostname")
             logging.info(str(stdout.readlines()))
             stdin, stdout, stderr = ssh.exec_command('hostname \"'+instance.name+"\"")
             logging.info(str(stdout.readlines()))
             hosts.write(instance.private_dns_name + "\t" + instance.name +"\n")
-            stdin, stdout, stderr = ssh.exec_command('reboot')
-            mInstances = self._eucacluster.block_until_running([instance])
+            #stdin, stdout, stderr = ssh.exec_command('reboot')
+            #mInstances = self._eucacluster.block_until_running([instance])
 
         hosts.close()
 
@@ -304,55 +306,58 @@ class Actuator(object):
             except:
                 logging.error("Unable to connect to node  " + str(instance.public_dns_name))
 
+            #START GANGLIA ON ADDED MACHINE
+            stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor start')
+            logging.info(str(stdout.readlines()))
             stdin, stdout, stderr = ssh.exec_command('/opt/hadoop-1.0.1/bin/hadoop-daemon.sh start datanode')
             logging.info(str(stdout.readlines()))
             stdin, stdout, stderr = ssh.exec_command('/opt/hbase-0.92.0-cdh4b1-rmv/bin/hbase-daemon.sh start regionserver')
             logging.info(str(stdout.readlines()))
 
         #RESTART GANGLIA TO FIX THE PROBLEM OF OPENSTACK RUNNING THE DEAMON
-        logging.info("Restarting ganlgia on Master.")
-        tries=0
-        while tries<10:
-            try:
-                tries+=1
-                ssh.connect("master", username='root', password='123456')
-                break
-            except:
-                logging.error("Unable to connect to node  " + "master"+ " after "+str(tries)+" attempts.")
-        stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
-        logging.info(str(stdout.readlines()))
-        ssh.close()
+#        logging.info("Restarting ganlgia on Master.")
+#        tries=0
+#        while tries<10:
+#            try:
+#                tries+=1
+#                ssh.connect("master", username='root', password='123456')
+#                break
+#            except:
+#                logging.error("Unable to connect to node  " + "master"+ " after "+str(tries)+" attempts.")
+#        stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
+#        logging.info(str(stdout.readlines()))
+#        ssh.close()
+#
+#        ssh = paramiko.SSHClient()
+#        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#        for clusterkey in self._stats.getRegionServers():
+#            if not clusterkey.endswith("master"):
+#                logging.info("Restarting ganlgia on Slave:"+str(clusterkey))
+#                tries=0
+#                while tries<10:
+#                    try:
+#                        tries+=1
+#                        ssh.connect(clusterkey, username=self._USERNAME, password=self._PASSWORD)
+#                        break
+#                    except:
+#                        logging.error("Unable to connect to node  " + str(clusterkey)+ " after "+str(tries)+" attempts.")
+#                stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
+#                logging.info(str(stdout.readlines()))
+#                ssh.close()
+#        for instance in mInstances:
+#            try:
+#                ssh.connect(instance.public_dns_name, username=self._USERNAME, password=self._PASSWORD)
+#                stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
+#                logging.info(str(stdout.readlines()))
+#                ssh.close()
+#            except:
+#                logging.error("Unable to connect to node  " + str(instance.public_dns_name))
+#
 
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        for clusterkey in self._stats.getRegionServers():
-            if not clusterkey.endswith("master"):
-                logging.info("Restarting ganlgia on Slave:"+str(clusterkey))
-                tries=0
-                while tries<10:
-                    try:
-                        tries+=1
-                        ssh.connect(clusterkey, username=self._USERNAME, password=self._PASSWORD)
-                        break
-                    except:
-                        logging.error("Unable to connect to node  " + str(clusterkey)+ " after "+str(tries)+" attempts.")
-                stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
-                logging.info(str(stdout.readlines()))
-                ssh.close()
-        for instance in mInstances:
-            try:
-                ssh.connect(instance.public_dns_name, username=self._USERNAME, password=self._PASSWORD)
-                stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
-                logging.info(str(stdout.readlines()))
-                ssh.close()
-            except:
-                logging.error("Unable to connect to node  " + str(instance.public_dns_name))
 
-
-
-    def major_compact(self,queue):
+    def major_compact(self,i,queue):
         while True:
-            logging.info('Major_compact thread started.')
+            logging.info('Major_compact thread '+str(i) +'started.')
             toCompact = queue.get(True,None)
 
             self._stats.refreshStats(False)
@@ -379,13 +384,14 @@ class Actuator(object):
                                 logging.info('Major compact of: '+str(region))
                                 self._metglue.majorCompact(region)
                                 #time.sleep(2)
-                                while(self.isBusyCompacting(rserver)):
-                                    logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
-                                    time.sleep(10)
+
                             except Exception, err:
                                 logging.error('ERROR:'+str(err))
                         #if major_compact then wait a while to get there faster
                         #time.sleep(30)
+                    while(self.isBusyCompacting(rserver)):
+                        logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
+                        time.sleep(20)
             queue.task_done()
 
 
