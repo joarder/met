@@ -342,6 +342,15 @@ class DecisionMaker(object):
             #FIRST RECONFIGURATION
             logging.info('Current state empty. First reconfig.')
 
+            for item in writemachines.keys():
+                physical = available_machines.pop()
+                self._machine_type[physical] = 'w'
+                self._actuator.configureServer(physical,'w',available_machines)
+                result[physical] = writemachines[item]
+                partialResult[physical] = writemachines[item]
+                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
+                partialResultConc.update(partialResult)
+                partialResult = {}
 
             for item in scanmachines.keys():
                 physical = available_machines.pop()
@@ -359,16 +368,6 @@ class DecisionMaker(object):
                 self._actuator.configureServer(physical,'r',available_machines)
                 result[physical] = readmachines[item]
                 partialResult[physical] = readmachines[item]
-                self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
-                partialResultConc.update(partialResult)
-                partialResult = {}
-
-            for item in writemachines.keys():
-                physical = available_machines.pop()
-                self._machine_type[physical] = 'w'
-                self._actuator.configureServer(physical,'w',available_machines)
-                result[physical] = writemachines[item]
-                partialResult[physical] = writemachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResultConc.update(partialResult)
                 partialResult = {}
@@ -454,8 +453,8 @@ class DecisionMaker(object):
             self._machtoadd = 1
             self._reconfigure = True
 
-        for reg in self._stats.getRegionServers():
-            while(self._actuator.isBusyCompacting(reg)):
-                logging.info('Waiting for major compact to finish in '+str(reg)+'...')
-                time.sleep(10)
+        #for reg in self._stats.getRegionServers():
+        while(self._actuator.isBusyCompactingFinal()):
+            logging.info('Waiting for major compact to finish in all regions.')
+            time.sleep(20)
 

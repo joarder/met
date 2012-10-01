@@ -169,7 +169,7 @@ class OpenStackCluster(object):
 	    except Exception, e:
 		print e.message
 	    try:
-		image = filter(lambda x:x.name=='met-nsdi-ganglia',nt.images.list())[0]
+		image = filter(lambda x:x.name=='met-eurosys-ganglia',nt.images.list())[0]
 		flavor = filter(lambda x:x.id=='11',nt.flavors.list())[0]
 		print image,flavor
 		new_instance = nt.servers.create(image=image, flavor=flavor, name=keyname,

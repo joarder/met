@@ -56,6 +56,13 @@ class Actuator(object):
         os.system("sed 's/BLOCKCACHESIZE/"+str(block)+"/g; s/GLOBALMEMSTOTEUPPERLIMIT/"+str(memu)+"/g; s/GLOBALMEMSTORELOWERLIMT/"+str(meml)+"/g' " + template + " > " + final)
         print 'File ',template,' configured with block:',str(block),' memu:',str(memu),' meml:',str(meml)
 
+    def isBusyCompactingFinal(self):
+        if self.queue.empty:
+            for reg in self._stats.getRegionServers():
+                return self._actuator.isBusyCompacting(reg)
+        else:
+            return True
+
     def isBusyCompacting(self,server):
         x = os.popen("curl \"http://"+server+":60030/rs-status\"").read()
         return "RUNNING" in x
@@ -356,9 +363,11 @@ class Actuator(object):
 
 
     def major_compact(self,i,queue):
+        logging.info('Thread '+str(i) +'to compact created!')
         while True:
-            logging.info('Thread '+str(i) +' is starting again to compact!')
+
             toCompact = queue.get(True,None)
+            logging.info('Thread '+str(i) +' is starting again to compact!')
 
             self._stats.refreshStats(False)
             logging.info('Thread getting from queue:'+str(toCompact))
