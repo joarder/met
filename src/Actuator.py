@@ -39,17 +39,18 @@ class Actuator(object):
             try:
                 tries+=1
                 transport.connect(username = self._USERNAME, password = self._PASSWORD)
+                transport.open_channel("session", host, "localhost")
+                sftp = paramiko.SFTPClient.from_transport(transport)
+                splittedpath = filepath.split('/')[-1]
+                sftp.put(filepath, whereto+'/'+splittedpath)
+                sftp.close()
+                logging.info('File '+str(filepath)+' copied to '+str(host)+'.')
                 break
             except:
                 print ("Unable to connect to node  " + str(host)+ " after "+str(tries)+" attempts.")
                 time.sleep(5)
 
-        transport.open_channel("session", host, "localhost")
-        sftp = paramiko.SFTPClient.from_transport(transport)
-        splittedpath = filepath.split('/')[-1]
-        sftp.put(filepath, whereto+'/'+splittedpath)
-        sftp.close()
-        logging.info('File '+str(filepath)+' copied to '+str(host)+'.')
+
 
 
     def configFile(self,template,final,block,memu,meml):
