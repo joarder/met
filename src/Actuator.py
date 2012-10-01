@@ -25,7 +25,7 @@ class Actuator(object):
         #queue for major compaction
         self.queue = Queue()
         #Two threads for major compacting meaning two simultaneous major compacts in the cluster
-        for i in range(1, 2):
+        for i in range(0, 2):
             thread = Thread(target=self.major_compact, args=(i,self.queue,))
             thread.setDaemon(True)
             thread.start()
@@ -177,7 +177,7 @@ class Actuator(object):
                     ser = longServerNames[rserver]
                     try:
                         self._metglue.move(region,ser,False)
-                        time.sleep(1)
+                        time.sleep(2)
                     except Exception, err:
                         logging.error('ERROR:'+str(err))
                     logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
