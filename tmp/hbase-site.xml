@@ -100,6 +100,14 @@
     Default: 1G.NOW: 512MB
     </description>
   </property>
+  <property>
+        <name>zookeeper.session.timeout</name>
+        <value>1200000</value>
+  </property>
+  <property>
+        <name>hbase.zookeeper.property.tickTime</name>
+        <value>6000</value>
+  </property>
 <!--<property>
     <name>hbase.hregion.memstore.flush.size</name>
     <value>268435456</value>

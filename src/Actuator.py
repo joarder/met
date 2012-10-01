@@ -24,8 +24,8 @@ class Actuator(object):
         self._MASTER = actuator_config.master
         #queue for major compaction
         self.queue = Queue()
-        #Two threads for major compacting meaning two simultaneous major compacts in the cluster
-        for i in range(0, 2):
+        #Three threads for major compacting meaning three simultaneous major compacts in the cluster
+        for i in range(0, 3):
             thread = Thread(target=self.major_compact, args=(i,self.queue,))
             thread.setDaemon(True)
             thread.start()
@@ -57,7 +57,7 @@ class Actuator(object):
         print 'File ',template,' configured with block:',str(block),' memu:',str(memu),' meml:',str(meml)
 
     def isBusyCompactingFinal(self):
-        if self.queue.empty:
+        if self.queue.empty():
             for reg in self._stats.getRegionServers():
                 return self.isBusyCompacting(reg)
         else:
