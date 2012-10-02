@@ -173,7 +173,7 @@ class OpenStackCluster(object):
 		flavor = filter(lambda x:x.id=='11',nt.flavors.list())[0]
 		print image,flavor
 		new_instance = nt.servers.create(image=image, flavor=flavor, name=keyname,
-		    #min_count=min_count,max_count=max_count,
+		    min_count=min_count,max_count=max_count,
 		    userdata=user_data,keyname=None,security_groups=['hbase'])
 	    except Exception, ex:
 		print ex.message
