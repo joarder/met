@@ -1,6 +1,6 @@
 __author__ = 'fmaia'
 
 nsamples=3
-nloop=1
+nloop=3
 sleeptime=30
 rampup=False
