@@ -272,8 +272,10 @@ class Actuator(object):
                 if num > maxID:
                     maxID=num
         name="region"+str(maxID+1)
-        instances = self._eucacluster.run_instances(" ", name, None, None, machtoadd, machtoadd, None)
-        logging.info("Launched new instance: " + str(instances))
+        instances = []
+        for i in range(0,machtoadd):
+            instances.extend(self._eucacluster.run_instances(" ", name, None, None, 1, 1, None))
+        logging.info("Launched new instance(s): " + str(instances))
         mInstances = self._eucacluster.block_until_running(instances)
         for instance in mInstances:
             hosts = open('/tmp/hosts', 'a')
