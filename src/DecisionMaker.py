@@ -129,7 +129,20 @@ class DecisionMaker(object):
 
         elif serverdiff<0 :
             #need to add machines
-            machines_per_tag['rw'] = machines_per_tag['rw'] + abs(serverdiff)
+            #machines_per_tag['rw'] = machines_per_tag['rw'] + abs(serverdiff)
+            temp = sorted(machines_per_tag_float.iteritems(), key=operator.itemgetter(1))
+            temp.pop()
+            pt = None
+            for i in temp:
+                if pt == None:
+                    pt = i
+                else:
+                    if i[1] > pt[1]:
+                       pt = i
+                    elif i[0] == 'r':
+                        pt = i
+            machines_per_tag[pt[0]] =  machines_per_tag[pt[0]] + abs(serverdiff)
+
 
         logging.info('Number of Regions: '+str(nregions))
         logging.info('Number of RegionServers: '+str(nregionservers))
@@ -137,6 +150,7 @@ class DecisionMaker(object):
 
         return machines_per_tag,regionTags
 
+    def
 
     def assignpertag(self,regions, nmachines):
 
