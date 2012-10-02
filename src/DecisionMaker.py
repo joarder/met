@@ -139,9 +139,10 @@ class DecisionMaker(object):
                     pt = i
                 else:
                     if i[1] > pt[1]:
-                       pt = i
-                    elif typeDying[i[0]]:
                         pt = i
+                    elif i[0]=='r':
+                        pt = i
+
             machines_per_tag[pt[0]] =  machines_per_tag[pt[0]] + abs(serverdiff)
 
 
@@ -150,6 +151,39 @@ class DecisionMaker(object):
         logging.info('Machines per tag: '+str(machines_per_tag))
 
         return machines_per_tag,regionTags
+
+
+    def topTagging(self,regionStats,nregionservers,typeDying={}):
+        if(typeDying=={}):
+            logging.info("First time MeT is tagging.")
+            return self.tagging(regionStats,nregionservers)
+        else:
+            machines_per_tag = {'rw':0,'s':0,'r':0,'w':0}
+            currentNumberMachines = 0
+            for k in self._machine_type.keys():
+                machines_per_tag[self._machine_type[k]] = machines_per_tag[self._machine_type[k]] + 1
+                currentNumberMachines = currentNumberMachines + 1
+            logging.info("Tagging. Current state:"+str(machines_per_tag))
+            newmachines = nregionservers - currentNumberMachines
+            if newmachines >= len(typeDying):
+                while(newmachines>0):
+                    for k in typeDying.keys():
+                        if newmachines> 0:
+                            machines_per_tag[k] = machines_per_tag[k] + 1
+                            newmachines = newmachines - 1
+            else:
+                return self.tagging(regionStats,nregionservers)
+
+            regionTags = {}
+            tag_count = {'rw':0,'s':0,'r':0,'w':0}
+            #tag each region according to request patterns
+            for region in regionStats.keys():
+                if not region.startswith('-ROOT') and not region.startswith('.META'):
+                    tag_,reqs = self.tagRegion(regionStats[region])
+                    regionTags[region] = (tag_,reqs)
+                    tag_count[tag_] = tag_count[tag_] + 1
+
+            return machines_per_tag,regionTags
 
 
     def assignpertag(self,regions, nmachines):
@@ -437,7 +471,7 @@ class DecisionMaker(object):
         if actionNeeded and self._reconfigure:
             nregionservers = self._stats.getNumberRegionServers()
             regionStats = self._stats.getRegionStats()
-            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers,dyingType)
+            tagged_machines,tagged_regions = self.topTagging(regionStats,nregionservers,dyingType)
             #going for ASSIGNMENT ALGORITHM
             readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
             #define which physical machine is going to accomodate which config (function 'f')
@@ -449,6 +483,8 @@ class DecisionMaker(object):
             logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:'+str(self._machtoadd))
             #for i in range(0,self._machtoadd):
             self._actuator.tiramolaAddMachine(self._machtoadd)
+            typesDying = len(dyingType)
+            self._machtoadd = max(self._machtoadd,typesDying)
             previousNOfSERVERS = self._stats.getNumberRegionServers()
             #NEED TO REFRESH STATS
             nregionservers = previousNOfSERVERS
@@ -457,7 +493,7 @@ class DecisionMaker(object):
                 nregionservers = self._stats.getNumberRegionServers()
             regionStats = self._stats.getRegionStats()
             #GOING FOR CONFIG WITH NEW MACHINES
-            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers,dyingType)
+            tagged_machines,tagged_regions = self.topTagging(regionStats,nregionservers,dyingType)
             #going for ASSIGNMENT ALGORITHM
             readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
             #define which physical machine is going to accomodate which config (function 'f')
