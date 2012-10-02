@@ -150,7 +150,6 @@ class DecisionMaker(object):
 
         return machines_per_tag,regionTags
 
-    def
 
     def assignpertag(self,regions, nmachines):
 
