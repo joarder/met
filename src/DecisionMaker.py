@@ -77,7 +77,7 @@ class DecisionMaker(object):
             return False
 
     #ASSIGN MACHINES TO TYPES OF HBASE NODE CONFIGURATIONS
-    def tagging(self,regionStats,nregionservers):
+    def tagging(self,regionStats,nregionservers,typeDying={}):
 
         regionTags = {}
         tag_count = {'rw':0,'s':0,'r':0,'w':0}
@@ -140,7 +140,7 @@ class DecisionMaker(object):
                 else:
                     if i[1] > pt[1]:
                        pt = i
-                    elif i[0] == 'r':
+                    elif typeDying[i[0]]:
                         pt = i
             machines_per_tag[pt[0]] =  machines_per_tag[pt[0]] + abs(serverdiff)
 
@@ -416,13 +416,15 @@ class DecisionMaker(object):
         actionNeeded = False
         machdying = 0
         nmach = 0
-
+        dyingType = {}
         #check if any of the regionServers is dying
         for rsKey in regionServerList:
             dying = self.isRegionServerDying(self._stats.getRegionServerStats(rsKey))
             logging.info(rsKey+' '+" is dying? "+' '+str(dying))
             if dying:
                 machdying = machdying + 1
+                if self._machine_type.has_key(rsKey):
+                    dyingType[self._machine_type[rsKey]]='True'
                 actionNeeded = True
             nmach = nmach + 1
 
@@ -435,7 +437,7 @@ class DecisionMaker(object):
         if actionNeeded and self._reconfigure:
             nregionservers = self._stats.getNumberRegionServers()
             regionStats = self._stats.getRegionStats()
-            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers)
+            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers,dyingType)
             #going for ASSIGNMENT ALGORITHM
             readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
             #define which physical machine is going to accomodate which config (function 'f')
@@ -455,7 +457,7 @@ class DecisionMaker(object):
                 nregionservers = self._stats.getNumberRegionServers()
             regionStats = self._stats.getRegionStats()
             #GOING FOR CONFIG WITH NEW MACHINES
-            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers)
+            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers,dyingType)
             #going for ASSIGNMENT ALGORITHM
             readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
             #define which physical machine is going to accomodate which config (function 'f')
