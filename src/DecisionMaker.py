@@ -4,6 +4,7 @@ import math
 import time
 import Actuator
 import decisionmaker_config
+import operator
 
 class DecisionMaker(object):
 
