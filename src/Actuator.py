@@ -397,20 +397,25 @@ class Actuator(object):
                     #for region in machines_to_regions[rserver]:
                     for a in sorted_regions:
                         region = a[0]
-                        #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
-                        if not region.startswith('load') and not region.startswith('len'):
-                            try:
-                                logging.info('Major compact of: '+str(region))
-                                self._metglue.majorCompact(region)
-                                #time.sleep(2)
-
-                            except Exception, err:
-                                logging.error('ERROR:'+str(err))
+                        rserver_stats = self._stats.getRegionServerStats(rserver)
+                        locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
+                        if (int(locality) < 95):
+                            #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
+                            if not region.startswith('load') and not region.startswith('len'):
+                                try:
+                                    logging.info('Major compact of: '+str(region))
+                                    self._metglue.majorCompact(region)
+                                    #time.sleep(2)
+                                    while(self.isBusyCompacting(rserver)):
+                                        logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
+                                        time.sleep(20)
+                                except Exception, err:
+                                    logging.error('ERROR:'+str(err))
                         #if major_compact then wait a while to get there faster
                         #time.sleep(30)
-                    while(self.isBusyCompacting(rserver)):
-                        logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
-                        time.sleep(20)
+#                    while(self.isBusyCompacting(rserver)):
+#                        logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
+#                        time.sleep(20)
             queue.task_done()
 
 

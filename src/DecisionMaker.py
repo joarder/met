@@ -397,7 +397,7 @@ class DecisionMaker(object):
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
 
-            
+
             #self._actuator.majorCompact(partialResultConc,self._machine_type)
 
 
