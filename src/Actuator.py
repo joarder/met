@@ -188,6 +188,9 @@ class Actuator(object):
                         self._metglue.move(region,ser,False)
                         while(self.isBusy()):
                             time.sleep(2)
+                        self._metglue.move(region,ser,False)
+                        while(self.isBusy()):
+                            time.sleep(2)
                     except Exception, err:
                         logging.error('ERROR:'+str(err))
                     logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
