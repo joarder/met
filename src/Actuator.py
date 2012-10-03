@@ -177,7 +177,7 @@ class Actuator(object):
 
 
     #Distribute (move) regions to regionservers
-    def distributeRegionsPerRS(self,machines_to_regions=None,machine_type=None):
+    def distributeRegionsPerRS(self,machines_to_regions=None,machine_type=None,current_config={}):
         longServerNames = self._stats.getServerLongNames()
         #MOVING REGIONS INTO PLACE
         for rserver in machines_to_regions:
@@ -199,6 +199,16 @@ class Actuator(object):
             time.sleep(5)
 
         logging.info('machine_to_regions:'+str(machines_to_regions))
+        if current_config != {}:
+            for machine in machines_to_regions.keys():
+                newregions = []
+                regions = machines_to_regions[machine]
+                for nregion in regions:
+                    if nregion not in current_config[machine]:
+                        newregions.append(nregion)
+                machines_to_regions[machine] = newregions
+
+
         logging.info('machine_type:'+str(machine_type))
         machines_to_regions.update({'machine_type':machine_type})
         logging.info('machine_to_regions2:'+str(machines_to_regions))

@@ -348,7 +348,7 @@ class DecisionMaker(object):
                     result[physical] = rwmachines[item]
 
                 #MOVE REGIONS INTO PLACE IF NEEDED
-                self._actuator.distributeRegionsPerRS(result,self._machine_type)
+                self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
 
             else:
                 #ATTENTION: CURRENTLY NOT CONSIDERING THE CASE WHERE THERE ARE FEWER MACHINES!
