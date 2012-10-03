@@ -211,7 +211,7 @@ class Actuator(object):
                     for nregion in regions:
                         if nregion not in current_config[machine]:
                             #newregions.append(nregion)
-                            newregions.update(nregion)
+                            newregions.update({nregion:regions[nregion]})
                     machines_to_regions[machine] = newregions
 
 
