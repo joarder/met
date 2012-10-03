@@ -206,11 +206,12 @@ class Actuator(object):
         if current_config != {}:
             for machine in machines_to_regions.keys():
                 if machine in current_config.keys():
-                    newregions = []
+                    newregions = {}
                     regions = machines_to_regions[machine]
                     for nregion in regions:
                         if nregion not in current_config[machine]:
-                            newregions.append(nregion)
+                            #newregions.append(nregion)
+                            newregions.update(nregion)
                     machines_to_regions[machine] = newregions
 
 
@@ -407,7 +408,7 @@ class Actuator(object):
                 if (int(locality) < 70 and machine_type[rserver]=="w") or (int(locality) < 90 and machine_type[rserver]!="w"):
                     #major_compact first the hotspot regions
                     sorted_regions = sorted(machines_to_regions[rserver].iteritems(), key=operator.itemgetter(1))
-                    sorted_regions.reverse()
+                    #sorted_regions.reverse()
 
                     #for region in machines_to_regions[rserver]:
                     for a in sorted_regions:
