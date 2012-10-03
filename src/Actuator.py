@@ -60,8 +60,12 @@ class Actuator(object):
     def isBusyCompactingFinal(self):
         if self.queue.empty():
             logging.info('Queue is empty.')
+            booleanRS = False
             for reg in self._stats.getRegionServers():
-                return self.isBusyCompacting(reg)
+                booleanAux = self.isBusyCompacting(reg)
+                booleanRS = booleanRS and booleanAux
+            return booleanRS
+
         else:
             return True
 
