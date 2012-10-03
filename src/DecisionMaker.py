@@ -452,8 +452,8 @@ class DecisionMaker(object):
             logging.info('CALLING TIRAMOLA TO ADD MACHINES! number of machines:'+str(self._machtoadd))
             #for i in range(0,self._machtoadd):
             self._actuator.tiramolaAddMachine(self._machtoadd)
-            typesDying = len(dyingType)
-            self._machtoadd = max(self._machtoadd,typesDying)
+            #typesDying = len(dyingType)
+            #self._machtoadd = max(self._machtoadd,typesDying)
             previousNOfSERVERS = self._stats.getNumberRegionServers()
             #NEED TO REFRESH STATS
             nregionservers = previousNOfSERVERS
