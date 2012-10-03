@@ -63,7 +63,7 @@ class Actuator(object):
             booleanRS = False
             for reg in self._stats.getRegionServers():
                 booleanAux = self.isBusyCompacting(reg)
-                booleanRS = booleanRS and booleanAux
+                booleanRS = booleanRS or booleanAux
             return booleanRS
 
         else:
