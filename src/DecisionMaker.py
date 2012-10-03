@@ -366,7 +366,6 @@ class DecisionMaker(object):
                 result[physical] = scanmachines[item]
                 partialResult[physical] = scanmachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
-                partialResultConc.update(partialResult)
                 partialResult = {}
 
             for item in readmachines.keys():
@@ -376,7 +375,6 @@ class DecisionMaker(object):
                 result[physical] = readmachines[item]
                 partialResult[physical] = readmachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
-                partialResultConc.update(partialResult)
                 partialResult = {}
 
 
@@ -388,7 +386,6 @@ class DecisionMaker(object):
                 partialResult[physical] = rwmachines[item]
                 logging.info('partialResult:'+str(partialResult))
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
-                partialResultConc.update(partialResult)
                 partialResult = {}
 
             for item in writemachines.keys():
@@ -398,9 +395,9 @@ class DecisionMaker(object):
                 result[physical] = writemachines[item]
                 partialResult[physical] = writemachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
-                partialResultConc.update(partialResult)
                 partialResult = {}
 
+            
             #self._actuator.majorCompact(partialResultConc,self._machine_type)
 
 

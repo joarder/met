@@ -17,7 +17,7 @@ def main():
 
     #RAMP UP
     if main_config.rampup:
-        time.sleep(240)
+        time.sleep(120)
 
     stats = Stats.Stats()
     decision_maker = DecisionMaker.DecisionMaker(stats)
