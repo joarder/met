@@ -205,12 +205,13 @@ class Actuator(object):
         logging.info('machine_to_regions:'+str(machines_to_regions))
         if current_config != {}:
             for machine in machines_to_regions.keys():
-                newregions = []
-                regions = machines_to_regions[machine]
-                for nregion in regions:
-                    if nregion not in current_config[machine]:
-                        newregions.append(nregion)
-                machines_to_regions[machine] = newregions
+                if machine in current_config.keys():
+                    newregions = []
+                    regions = machines_to_regions[machine]
+                    for nregion in regions:
+                        if nregion not in current_config[machine]:
+                            newregions.append(nregion)
+                    machines_to_regions[machine] = newregions
 
 
         logging.info('machine_type:'+str(machine_type))
