@@ -467,7 +467,7 @@ class DecisionMaker(object):
             previousNOfSERVERS = self._stats.getNumberRegionServers()
             #NEED TO REFRESH STATS
             nregionservers = previousNOfSERVERS
-            while(nregionservers==previousNOfSERVERS):
+            while(nregionservers!=previousNOfSERVERS+self._machtoadd):
                 self._stats.refreshStats(False)
                 nregionservers = self._stats.getNumberRegionServers()
             logging.info("New machines detected. Going for configs.")
