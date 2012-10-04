@@ -187,7 +187,9 @@ class Actuator(object):
         for rserver in machines_to_regions:
             sorted_regions = sorted(machines_to_regions[rserver].iteritems(), key=operator.itemgetter(1))
             #for region in machines_to_regions[rserver]:
-            for region in sorted_regions:
+            #for region in sorted_regions:
+            for a in sorted_regions:
+                region = a[0]
                 if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
                     ser = longServerNames[rserver]
                     try:
