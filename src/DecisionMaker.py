@@ -328,27 +328,40 @@ class DecisionMaker(object):
                     self._machine_type[physical] = 'r'
                     self._actuator.configureServer(physical,'r')
                     result[physical] = readmachines[item]
+                    partialResult[physical] = readmachines[item]
+                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                    partialResult = {}
 
                 for item in cwritemachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'w'
                     self._actuator.configureServer(physical,'w')
                     result[physical] = writemachines[item]
+                    partialResult[physical] = writemachines[item]
+                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                    partialResult = {}
 
                 for item in cscanmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 's'
                     self._actuator.configureServer(physical,'s')
                     result[physical] = scanmachines[item]
+                    partialResult[physical] = scanmachines[item]
+                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                    partialResult = {}
 
                 for item in crwmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'rw'
                     self._actuator.configureServer(physical,'rw')
                     result[physical] = rwmachines[item]
+                    partialResult[physical] = rwmachines[item]
+                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                    partialResult = {}
+
 
                 #MOVE REGIONS INTO PLACE IF NEEDED
-                self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
+                #self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
 
             else:
                 #ATTENTION: CURRENTLY NOT CONSIDERING THE CASE WHERE THERE ARE FEWER MACHINES!
