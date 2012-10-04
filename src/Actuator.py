@@ -24,6 +24,7 @@ class Actuator(object):
         self._MASTER = actuator_config.master
         #queue for major compaction
         self.queue = Queue()
+        self.queuePending = Queue()
         #Three threads for major compacting meaning three simultaneous major compacts in the cluster
         for i in range(0, 3):
             thread = Thread(target=self.major_compact, args=(i,self.queue,))
@@ -58,14 +59,14 @@ class Actuator(object):
         print 'File ',template,' configured with block:',str(block),' memu:',str(memu),' meml:',str(meml)
 
     def isBusyCompactingFinal(self):
-        if self.queue.empty():
-            logging.info('Queue is empty.')
-            booleanRS = False
-            for reg in self._stats.getRegionServers():
-                booleanAux = self.isBusyCompacting(reg)
-                booleanRS = booleanRS or booleanAux
-            return booleanRS
-
+        if self.queuePending.empty():
+#            logging.info('Queue is empty.')
+#            booleanRS = False
+#            for reg in self._stats.getRegionServers():
+#                booleanAux = self.isBusyCompacting(reg)
+#                booleanRS = booleanRS or booleanAux
+#            return booleanRS
+            return False
         else:
             return True
 
@@ -220,6 +221,7 @@ class Actuator(object):
         logging.info('machine_to_regions2:'+str(machines_to_regions))
         logging.info('Putting in queue:')
         self.queue.put(machines_to_regions)
+        self.queuePending.put(True)
 
 #        self._stats.refreshStats(False)
 #        for rserver in machines_to_regions:
@@ -395,7 +397,7 @@ class Actuator(object):
 #
 
 
-    def major_compact(self,i,queue):
+    def major_compact(self,i,queue,queuePending):
         logging.info('Thread '+str(i) +'to compact created!')
         while True:
 
@@ -439,7 +441,9 @@ class Actuator(object):
 #                    while(self.isBusyCompacting(rserver)):
 #                        logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
 #                        time.sleep(20)
+            queuePending.get(True,None)
             queue.task_done()
+            queuePending.task_done()
 
 
 #def major_compact_sync(self,machines_to_regions):
