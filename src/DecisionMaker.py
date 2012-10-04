@@ -457,6 +457,7 @@ class DecisionMaker(object):
             while(nregionservers==previousNOfSERVERS):
                 self._stats.refreshStats(False)
                 nregionservers = self._stats.getNumberRegionServers()
+            logging.info("New machines detected. Going for configs.")
             regionStats = self._stats.getRegionStats()
             #GOING FOR CONFIG WITH NEW MACHINES
             tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers,dyingType)

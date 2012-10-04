@@ -303,10 +303,11 @@ class Actuator(object):
                 num=int(instance.name[6:])
                 if num > maxID:
                     maxID=num
-        name="region"+str(maxID+1)
         instances = []
         for i in range(0,machtoadd):
-            instances.extend(self._eucacluster.run_instances(" ", name, None, None, 1, 1, None))
+            name="region"+str(maxID+1)
+            maxID = maxID + 1
+            instances.extend(self._eucacluster.run_instances(" ",name))
         logging.info("Launched new instance(s): " + str(instances))
         mInstances = self._eucacluster.block_until_running(instances)
         for instance in mInstances:
@@ -330,7 +331,12 @@ class Actuator(object):
 
         hosts.close()
 
-        for node in ["master","10.0.108.16","10.0.108.19", mInstances[0].public_dns_name]:
+        nins = []
+        for ins in mInstances:
+            nins.append(ins.public_dns_name)
+        lista = ["master","10.0.108.16","10.0.108.19"]
+        lista.extend(nins)
+        for node in lista:
             transport = paramiko.Transport((node, 22))
             try:
                 transport.connect(username = 'root', password = '123456')
@@ -448,4 +454,4 @@ class Actuator(object):
             queue.task_done()
 
 
-def major_compact_sync(self,machines_to_regions):
+#def major_compact_sync(self,machines_to_regions):

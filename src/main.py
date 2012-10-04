@@ -17,8 +17,10 @@ def main():
 
     #RAMP UP
     if main_config.rampup:
+        logging.info("Now sleeping for ramp up time of 240s.")
         time.sleep(240)
 
+    logging.info('MeT in business.')
     stats = Stats.Stats()
     decision_maker = DecisionMaker.DecisionMaker(stats)
 
@@ -27,10 +29,14 @@ def main():
         ran = ran + 1
 
         logging.info('Running cycle %s' % str(ran))
+
         stats.refreshStats(True)
 
         if ran == main_config.nsamples:
             doStuff = True
+        else:
+            if not doStuff:
+                time.sleep(main_config.sleeptime)
 
         if doStuff:
             logging.info('Going to process cluster status.')
@@ -40,21 +46,21 @@ def main():
             doStuff = False
             ran = 0
             stats.resetStats()
+            runs = runs - 1
             logging.info('Finished round.')
+            time.sleep(main_config.sleeptime)
 
-        time.sleep(main_config.sleeptime)
-        runs = runs - 1
 
         if runs == 0:
             running = False
 
-    logging.info('EXITED.')
+    logging.info('MeT ended and EXITED.')
 
 if __name__ == '__main__':
 
     logging.basicConfig(format='%(asctime)s %(message)s',filename='met.log', level=logging.INFO)
-    logging.info('Started')
+    logging.info('Started MeT.')
 
-    logging.info('Starting MeT.')
+
 
     main()
