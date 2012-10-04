@@ -185,7 +185,9 @@ class Actuator(object):
         longServerNames = self._stats.getServerLongNames()
         #MOVING REGIONS INTO PLACE
         for rserver in machines_to_regions:
-            for region in machines_to_regions[rserver]:
+            sorted_regions = sorted(machines_to_regions[rserver].iteritems(), key=operator.itemgetter(1))
+            #for region in machines_to_regions[rserver]:
+            for region in sorted_regions:
                 if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
                     ser = longServerNames[rserver]
                     try:
@@ -198,7 +200,17 @@ class Actuator(object):
                     except Exception, err:
                         logging.error('ERROR:'+str(err))
                     logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
-
+                    try:
+                        #SYNC MAJOR_COMPACT
+                        logging.info('Major compact of: '+str(region))
+                        self._metglue.majorCompact(region)
+                        #time.sleep(2)
+                        while(self.isBusyCompacting(rserver)):
+                            logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
+                            time.sleep(10)
+                    except Exception, err:
+                        logging.error('ERROR:'+str(err))
+                        
         while(self.isBusy()):
             time.sleep(5)
 
@@ -219,7 +231,8 @@ class Actuator(object):
         machines_to_regions.update({'machine_type':machine_type})
         logging.info('machine_to_regions2:'+str(machines_to_regions))
         logging.info('Putting in queue:')
-        self.queue.put(machines_to_regions)
+        #self.queue.put(machines_to_regions)
+
 #        self._stats.refreshStats(False)
 #        for rserver in machines_to_regions:
 #            rserver_stats = self._stats.getRegionServerStats(rserver)
@@ -435,3 +448,4 @@ class Actuator(object):
             queue.task_done()
 
 
+def major_compact_sync(self,machines_to_regions):
