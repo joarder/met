@@ -27,7 +27,7 @@ class Actuator(object):
         self.queuePending = Queue()
         #Three threads for major compacting meaning three simultaneous major compacts in the cluster
         for i in range(0, 3):
-            thread = Thread(target=self.major_compact, args=(i,self.queue,))
+            thread = Thread(target=self.major_compact, args=(i,self.queue,self.queuePending,))
             thread.setDaemon(True)
             thread.start()
         logging.info('Actuator started.')
