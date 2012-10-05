@@ -480,7 +480,8 @@ class DecisionMaker(object):
             self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
 
             #Update control vars
-            self._machtoadd = self._machtoadd * 2
+            if self._machtoadd <2:
+                self._machtoadd = self._machtoadd * 2
             self._reconfigure = False
 
         else:
