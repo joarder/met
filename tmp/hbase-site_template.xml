@@ -25,7 +25,7 @@
  <property>
 
   <name>hbase.rootdir</name>
-	<value>hdfs://10.0.108.25:8020/hbase</value>
+	<value>hdfs://10.0.108.3:8020/hbase</value>
         <!--<value>hdfs://cloud04.cluster.lsd.di.uminho.pt:8020/hbase</value>-->
         <description>The directory shared by region servers.</description>
 
@@ -36,7 +36,7 @@
  </property>
  <property>
     <name>hbase.zookeeper.quorum</name>
-     <value>10.0.108.25</value>
+     <value>10.0.108.3</value>
     <!--<value>cloud04.cluster.lsd.di.uminho.pt</value>--> 
  </property>
  <property>
