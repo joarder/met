@@ -454,7 +454,7 @@ class DecisionMaker(object):
             nmach = nmach + 1
 
         #CHECK IF WE NEED TO ADD/REMOVE MACHINES to address critical state
-        if machdying/nmach > self._CRITICAL_PERC or bigbang:
+        if machdying/(nmach+0.0) > self._CRITICAL_PERC or bigbang:
             #cluster in bad shape - add machines
             self._reconfigure = False
 
