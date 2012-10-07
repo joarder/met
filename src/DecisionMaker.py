@@ -294,6 +294,9 @@ class DecisionMaker(object):
                         result[physical] = readmachines[item]
                         del creadmachines[item]
                         del cur[physical]
+                        partialResult[physical] = readmachines[item]
+                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                        partialResult = {}
 
                 for item in writemachines.keys():
                     physical = self.getClosest(writemachines[item],'w',cur)
@@ -302,6 +305,9 @@ class DecisionMaker(object):
                         result[physical] = writemachines[item]
                         del cwritemachines[item]
                         del cur[physical]
+                        partialResult[physical] = writemachines[item]
+                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                        partialResult = {}
 
                 for item in scanmachines.keys():
                     physical = self.getClosest(scanmachines[item],'s',cur)
@@ -310,6 +316,9 @@ class DecisionMaker(object):
                         result[physical] = scanmachines[item]
                         del cscanmachines[item]
                         del cur[physical]
+                        partialResult[physical] = scanmachines[item]
+                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                        partialResult = {}
 
                 for item in rwmachines.keys():
                     physical = self.getClosest(rwmachines[item],'rw',cur)
@@ -318,6 +327,9 @@ class DecisionMaker(object):
                         result[physical] = rwmachines[item]
                         del crwmachines[item]
                         del cur[physical]
+                        partialResult[physical] = rwmachines[item]
+                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
+                        partialResult = {}
 
                 #at this point every machine was matched to a possible assignment
                 #next step is to check for missing assignments and possible change of configs

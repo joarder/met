@@ -184,6 +184,7 @@ class Actuator(object):
     #Distribute (move) regions to regionservers
     def distributeRegionsPerRS(self,machines_to_regions=None,machine_type=None,current_config={}):
         longServerNames = self._stats.getServerLongNames()
+        logging.info('distributeRegionsPerRS: '+str(machines_to_regions))
         #MOVING REGIONS INTO PLACE
         for rserver in machines_to_regions:
             for region in machines_to_regions[rserver]:
@@ -214,6 +215,7 @@ class Actuator(object):
                             #newregions.append(nregion)
                             newregions.update({nregion:regions[nregion]})
                     machines_to_regions[machine] = newregions
+                    logging.info('machines_to_regions after current_config')
 
 
         logging.info('machine_type:'+str(machine_type))
