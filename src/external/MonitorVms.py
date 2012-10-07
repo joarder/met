@@ -57,7 +57,7 @@ class MonitorVms:
         #self.utils = Utils.Utils()
         self.cluster = cluster
         
-        self.ganglia_host = "10.0.108.25"
+        self.ganglia_host = "10.0.108.3"
         self.ganglia_port = 8649
         
 #        self.host = ""
