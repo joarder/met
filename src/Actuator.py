@@ -219,6 +219,7 @@ class Actuator(object):
                     logging.info('machines_to_regions after current_config')
 
             for regions_to_move in machines_to_regions:
+                logging.info('Regions_to_move: '+str(regions_to_move))
                 regions_to_move.update({'machine_type':machine_type})
                 logging.info('Putting in queue:')
                 self.queue.put(regions_to_move)
