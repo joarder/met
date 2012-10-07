@@ -294,9 +294,6 @@ class DecisionMaker(object):
                         result[physical] = readmachines[item]
                         del creadmachines[item]
                         del cur[physical]
-                        partialResult[physical] = readmachines[item]
-                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                        partialResult = {}
 
                 for item in writemachines.keys():
                     physical = self.getClosest(writemachines[item],'w',cur)
@@ -305,9 +302,6 @@ class DecisionMaker(object):
                         result[physical] = writemachines[item]
                         del cwritemachines[item]
                         del cur[physical]
-                        partialResult[physical] = writemachines[item]
-                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                        partialResult = {}
 
                 for item in scanmachines.keys():
                     physical = self.getClosest(scanmachines[item],'s',cur)
@@ -316,9 +310,6 @@ class DecisionMaker(object):
                         result[physical] = scanmachines[item]
                         del cscanmachines[item]
                         del cur[physical]
-                        partialResult[physical] = scanmachines[item]
-                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                        partialResult = {}
 
                 for item in rwmachines.keys():
                     physical = self.getClosest(rwmachines[item],'rw',cur)
@@ -327,9 +318,6 @@ class DecisionMaker(object):
                         result[physical] = rwmachines[item]
                         del crwmachines[item]
                         del cur[physical]
-                        partialResult[physical] = rwmachines[item]
-                        self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                        partialResult = {}
 
                 #at this point every machine was matched to a possible assignment
                 #next step is to check for missing assignments and possible change of configs
@@ -340,40 +328,28 @@ class DecisionMaker(object):
                     self._machine_type[physical] = 'r'
                     self._actuator.configureServer(physical,'r')
                     result[physical] = readmachines[item]
-                    partialResult[physical] = readmachines[item]
-                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                    partialResult = {}
 
                 for item in cwritemachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'w'
                     self._actuator.configureServer(physical,'w')
                     result[physical] = writemachines[item]
-                    partialResult[physical] = writemachines[item]
-                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                    partialResult = {}
 
                 for item in cscanmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 's'
                     self._actuator.configureServer(physical,'s')
                     result[physical] = scanmachines[item]
-                    partialResult[physical] = scanmachines[item]
-                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                    partialResult = {}
 
                 for item in crwmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'rw'
                     self._actuator.configureServer(physical,'rw')
                     result[physical] = rwmachines[item]
-                    partialResult[physical] = rwmachines[item]
-                    self._actuator.distributeRegionsPerRS(partialResult,self._machine_type,self._current_config)
-                    partialResult = {}
 
 
                 #MOVE REGIONS INTO PLACE IF NEEDED
-                #self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
+                self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
 
             else:
                 #ATTENTION: CURRENTLY NOT CONSIDERING THE CASE WHERE THERE ARE FEWER MACHINES!

@@ -205,6 +205,7 @@ class Actuator(object):
             time.sleep(5)
 
         logging.info('machine_to_regions:'+str(machines_to_regions))
+        #NOT FIRST RECONFIGURATION
         if current_config != {}:
             for machine in machines_to_regions.keys():
                 if machine in current_config.keys():
@@ -217,13 +218,20 @@ class Actuator(object):
                     machines_to_regions[machine] = newregions
                     logging.info('machines_to_regions after current_config')
 
+            for regions_to_move in machines_to_regions:
+                regions_to_move.update({'machine_type':machine_type})
+                logging.info('Putting in queue:')
+                self.queue.put(regions_to_move)
+                self.queuePending.put(True)
 
-        logging.info('machine_type:'+str(machine_type))
-        machines_to_regions.update({'machine_type':machine_type})
-        logging.info('machine_to_regions2:'+str(machines_to_regions))
-        logging.info('Putting in queue:')
-        self.queue.put(machines_to_regions)
-        self.queuePending.put(True)
+        #FIRST RECONFIGURATION
+        else:
+            logging.info('machine_type:'+str(machine_type))
+            machines_to_regions.update({'machine_type':machine_type})
+            logging.info('machine_to_regions2:'+str(machines_to_regions))
+            logging.info('Putting in queue:')
+            self.queue.put(machines_to_regions)
+            self.queuePending.put(True)
 
 #        self._stats.refreshStats(False)
 #        for rserver in machines_to_regions:
