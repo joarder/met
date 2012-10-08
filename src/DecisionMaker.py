@@ -321,7 +321,7 @@ class DecisionMaker(object):
 
                 #at this point every machine was matched to a possible assignment
                 #next step is to check for missing assignments and possible change of configs
-                machinesleft = creadmachines.keys()+cwritemachines.keys()+cscanmachines.keys()+crwmachines.keys()+newmachines
+                machinesleft = cur.keys()+newmachines
 
                 for item in creadmachines.keys():
                     physical = machinesleft.pop()
