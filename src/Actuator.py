@@ -1,3 +1,5 @@
+import copy
+
 __author__ = 'fmaia'
 import logging
 import actuator_config
@@ -201,8 +203,6 @@ class Actuator(object):
                         logging.error('ERROR:'+str(err))
                     logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
 
-        while(self.isBusy()):
-            time.sleep(5)
 
         logging.info('machine_to_regions:'+str(machines_to_regions))
         #NOT FIRST RECONFIGURATION
@@ -216,13 +216,16 @@ class Actuator(object):
                             #newregions.append(nregion)
                             newregions.update({nregion:regions[nregion]})
                     machines_to_regions[machine] = newregions
-                    logging.info('machines_to_regions after current_config')
+                    logging.info('machines_to_regions after current_config'+str(machines_to_regions[machines_to_regions]))
 
             for regions_to_move in machines_to_regions:
                 logging.info('Regions_to_move: '+str(regions_to_move))
-                regions_to_move.update({'machine_type':machine_type})
+                reglist = copy.deepcopy(machines_to_regions[regions_to_move])
+                resultl = {}
+                resultl[regions_to_move] = reglist
+                resultl['machine_type'] = machine_type
                 logging.info('Putting in queue:')
-                self.queue.put(regions_to_move)
+                self.queue.put(resultl)
                 self.queuePending.put(True)
 
         #FIRST RECONFIGURATION
