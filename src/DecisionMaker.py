@@ -326,25 +326,25 @@ class DecisionMaker(object):
                 for item in creadmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'r'
-                    self._actuator.configureServer(physical,'r')
+                    self._actuator.configureServer(physical,'r', self._current_config.keys())
                     result[physical] = readmachines[item]
 
                 for item in cwritemachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'w'
-                    self._actuator.configureServer(physical,'w')
+                    self._actuator.configureServer(physical,'w', self._current_config.keys())
                     result[physical] = writemachines[item]
 
                 for item in cscanmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 's'
-                    self._actuator.configureServer(physical,'s')
+                    self._actuator.configureServer(physical,'s', self._current_config.keys())
                     result[physical] = scanmachines[item]
 
                 for item in crwmachines.keys():
                     physical = machinesleft.pop()
                     self._machine_type[physical] = 'rw'
-                    self._actuator.configureServer(physical,'rw')
+                    self._actuator.configureServer(physical,'rw', self._current_config.keys())
                     result[physical] = rwmachines[item]
 
 

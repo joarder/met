@@ -130,8 +130,9 @@ class Actuator(object):
 
         serverlist = available_machines
         i=0
+
         for regionn in theseRegions:
-            if len(serverlist) > 0:
+            if len(serverlist) > 0 :
                 try:
                     temh = serverlist[i%len(serverlist)]
                     if temh != server:
