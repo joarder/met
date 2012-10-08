@@ -434,6 +434,7 @@ class DecisionMaker(object):
             #cluster in bad shape - add machines
             self._reconfigure = False
 
+
         #If we need to reconfigure stuff then:
         if actionNeeded and self._reconfigure:
             nregionservers = self._stats.getNumberRegionServers()

@@ -187,22 +187,6 @@ class Actuator(object):
     def distributeRegionsPerRS(self,machines_to_regions=None,machine_type=None,current_config={}):
         longServerNames = self._stats.getServerLongNames()
         logging.info('distributeRegionsPerRS: '+str(machines_to_regions))
-        #MOVING REGIONS INTO PLACE
-        for rserver in machines_to_regions:
-            for region in machines_to_regions[rserver]:
-                if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
-                    ser = longServerNames[rserver]
-                    try:
-                        self._metglue.move(region,ser,False)
-                        while(self.isBusy()):
-                            time.sleep(2)
-                        self._metglue.move(region,ser,False)
-                        while(self.isBusy()):
-                            time.sleep(2)
-                    except Exception, err:
-                        logging.error('ERROR:'+str(err))
-                    logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
-
 
         logging.info('machine_to_regions:'+str(machines_to_regions))
         #NOT FIRST RECONFIGURATION
@@ -216,7 +200,23 @@ class Actuator(object):
                             #newregions.append(nregion)
                             newregions.update({nregion:regions[nregion]})
                     machines_to_regions[machine] = newregions
-                    logging.info('machines_to_regions after current_config'+str(machines_to_regions[machines_to_regions]))
+                    logging.info('machines_to_regions after current_config'+str(machines_to_regions[machine]))
+
+            #MOVING REGIONS INTO PLACE
+            for rserver in machines_to_regions:
+                for region in machines_to_regions[rserver]:
+                    if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
+                        ser = longServerNames[rserver]
+                        try:
+                            self._metglue.move(region,ser,False)
+                            while(self.isBusy()):
+                                time.sleep(2)
+                            self._metglue.move(region,ser,False)
+                            while(self.isBusy()):
+                                time.sleep(2)
+                        except Exception, err:
+                            logging.error('ERROR:'+str(err))
+                        logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
 
             for regions_to_move in machines_to_regions:
                 logging.info('Regions_to_move: '+str(regions_to_move))
@@ -230,6 +230,23 @@ class Actuator(object):
 
         #FIRST RECONFIGURATION
         else:
+             #MOVING REGIONS INTO PLACE
+            for rserver in machines_to_regions:
+                for region in machines_to_regions[rserver]:
+                    if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
+                        ser = longServerNames[rserver]
+                        try:
+                            self._metglue.move(region,ser,False)
+                            while(self.isBusy()):
+                                time.sleep(2)
+                            self._metglue.move(region,ser,False)
+                            while(self.isBusy()):
+                                time.sleep(2)
+                        except Exception, err:
+                            logging.error('ERROR:'+str(err))
+                        logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
+
+
             logging.info('machine_type:'+str(machine_type))
             machines_to_regions.update({'machine_type':machine_type})
             logging.info('machine_to_regions2:'+str(machines_to_regions))
