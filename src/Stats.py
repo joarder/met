@@ -5,7 +5,8 @@ import logging
 import MeTGlue
 import MonitorVms
 import monitor_config
-from threading import Thread
+#from threading import Thread
+import threading
 
 class Stats(object):
 
@@ -23,7 +24,7 @@ class Stats(object):
         self._ALPHA = monitor_config.alpha
         self.refreshStats(False)
         logging.info('Stats started.')
-        self._lock = Thread.allocate_lock()
+        self._lock =  threading.Lock()
 
 
     def getMeTGlue(self):
