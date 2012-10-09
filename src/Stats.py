@@ -22,9 +22,10 @@ class Stats(object):
         logging.info('Connected to Ganglia.')
         self._metric_filter = ["cpu_idle","cpu_wio","hbase.regionserver.hdfsBlocksLocalityIndex"]
         self._ALPHA = monitor_config.alpha
+        self._lock =  threading.Lock()
         self.refreshStats(False)
         logging.info('Stats started.')
-        self._mut =  threading.Lock()
+
 
 
     def getMeTGlue(self):
@@ -58,7 +59,7 @@ class Stats(object):
     def refreshStats(self,CYCLE=True):
 
 
-        self._mut.acquire()
+        self._lock.acquire()
         try:
             self._clusterHBase = []
             #get new stats
@@ -100,4 +101,4 @@ class Stats(object):
         except:
             logging.error("ERROR IN REFRESHSTATS")
         finally:
-            self._mut.release()
+            self._lock.release()
