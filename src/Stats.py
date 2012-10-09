@@ -56,42 +56,46 @@ class Stats(object):
 
     def refreshStats(self,CYCLE=True):
 
-        self._lock.acquire()
-        self._clusterHBase = []
-        #get new stats
-        ganglia_metrics = self._monVms.refreshMetrics()
-        cluster_metrics = self._metGlue.getRegionServerStats(False)
-        for serverid in cluster_metrics.keys():
-            short = str(serverid).split(',')[0]
-            self._clusterHBase.append(short)
-            self._rserver_longname[short] = serverid
+        try:
+            self._lock.acquire()
+            self._clusterHBase = []
+            #get new stats
+            ganglia_metrics = self._monVms.refreshMetrics()
+            cluster_metrics = self._metGlue.getRegionServerStats(False)
+            for serverid in cluster_metrics.keys():
+                short = str(serverid).split(',')[0]
+                self._clusterHBase.append(short)
+                self._rserver_longname[short] = serverid
 
-        self._region_metrics = self._metGlue.getRegionStats(False)
-        regionservers = ganglia_metrics.keys()
+            self._region_metrics = self._metGlue.getRegionStats(False)
+            regionservers = ganglia_metrics.keys()
 
-        #combined stats to process - using alpha smoothing technique
-        for key in regionservers:
-            if key in self._clusterHBase and key in regionservers:
-                if key not in self._stats.keys():
-                    self._stats[key] = {}
-                for kmetric in ganglia_metrics[key].keys():
-                    if kmetric in self._stats[key].keys() and kmetric in self._metric_filter:
-                        value_ = ganglia_metrics[key][kmetric]
-                        old_value = self._stats[key][kmetric]
-                        self._stats[key][kmetric] = (self._ALPHA*float(value_)) + ((1-self._ALPHA)*float(old_value))
-                    elif kmetric in self._metric_filter:
-                        self._stats[key][kmetric] = ganglia_metrics[key][kmetric]
+            #combined stats to process - using alpha smoothing technique
+            for key in regionservers:
+                if key in self._clusterHBase and key in regionservers:
+                    if key not in self._stats.keys():
+                        self._stats[key] = {}
+                    for kmetric in ganglia_metrics[key].keys():
+                        if kmetric in self._stats[key].keys() and kmetric in self._metric_filter:
+                            value_ = ganglia_metrics[key][kmetric]
+                            old_value = self._stats[key][kmetric]
+                            self._stats[key][kmetric] = (self._ALPHA*float(value_)) + ((1-self._ALPHA)*float(old_value))
+                        elif kmetric in self._metric_filter:
+                            self._stats[key][kmetric] = ganglia_metrics[key][kmetric]
 
-        for k in cluster_metrics.keys():
-            key = str(k).split(',')[0]
-            tmp_stats = cluster_metrics[k]
-            for subkey in tmp_stats.keys():
-                self._stats[key][subkey] = tmp_stats[subkey]
+            for k in cluster_metrics.keys():
+                key = str(k).split(',')[0]
+                tmp_stats = cluster_metrics[k]
+                for subkey in tmp_stats.keys():
+                    self._stats[key][subkey] = tmp_stats[subkey]
 
-        if CYCLE:
-            for rserver in self._stats.keys():
-                logging.info(rserver+' cpu_idle:'+str(self._stats[rserver]['cpu_idle'])+" cpu_wio:"+str(self._stats[rserver]['cpu_wio'])+" locality:"+str(self._stats[rserver]['hbase.regionserver.hdfsBlocksLocalityIndex']))
-        else:
-            logging.info('Stats refreshed. Servers: '+str(self._clusterHBase))
+            if CYCLE:
+                for rserver in self._stats.keys():
+                    logging.info(rserver+' cpu_idle:'+str(self._stats[rserver]['cpu_idle'])+" cpu_wio:"+str(self._stats[rserver]['cpu_wio'])+" locality:"+str(self._stats[rserver]['hbase.regionserver.hdfsBlocksLocalityIndex']))
+            else:
+                logging.info('Stats refreshed. Servers: '+str(self._clusterHBase))
 
-        self._lock.release()
+        except:
+            logging.error("ERROR IN REFRESHSTATS")
+        finally:
+            self._lock.release()
