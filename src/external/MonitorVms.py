@@ -3,7 +3,6 @@ import shutil
 import socket
 import fileinput, paramiko#, Utils
 import xml.parsers.expat
-
 class GParser:
     
     
@@ -59,7 +58,7 @@ class MonitorVms:
         
         self.ganglia_host = "10.0.108.3"
         self.ganglia_port = 8649
-        
+
 #        self.host = ""
         #metric = 'swap_free'
         #self.configure_monitoring()

@@ -5,6 +5,7 @@ import logging
 import MeTGlue
 import MonitorVms
 import monitor_config
+from threading import Thread
 
 class Stats(object):
 
@@ -22,6 +23,7 @@ class Stats(object):
         self._ALPHA = monitor_config.alpha
         self.refreshStats(False)
         logging.info('Stats started.')
+        self._lock = Thread.allocate_lock()
 
 
     def getMeTGlue(self):
@@ -54,6 +56,7 @@ class Stats(object):
 
     def refreshStats(self,CYCLE=True):
 
+        self._lock.acquire()
         self._clusterHBase = []
         #get new stats
         ganglia_metrics = self._monVms.refreshMetrics()
@@ -90,3 +93,5 @@ class Stats(object):
                 logging.info(rserver+' cpu_idle:'+str(self._stats[rserver]['cpu_idle'])+" cpu_wio:"+str(self._stats[rserver]['cpu_wio'])+" locality:"+str(self._stats[rserver]['hbase.regionserver.hdfsBlocksLocalityIndex']))
         else:
             logging.info('Stats refreshed. Servers: '+str(self._clusterHBase))
+
+        self._lock.release()
