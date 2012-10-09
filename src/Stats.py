@@ -24,7 +24,7 @@ class Stats(object):
         self._ALPHA = monitor_config.alpha
         self.refreshStats(False)
         logging.info('Stats started.')
-        self.mut =  threading.Lock()
+        self._mut =  threading.Lock()
 
 
     def getMeTGlue(self):
@@ -57,8 +57,9 @@ class Stats(object):
 
     def refreshStats(self,CYCLE=True):
 
+
+        self._mut.acquire()
         try:
-            self.mut.acquire()
             self._clusterHBase = []
             #get new stats
             ganglia_metrics = self._monVms.refreshMetrics()
@@ -99,4 +100,4 @@ class Stats(object):
         except:
             logging.error("ERROR IN REFRESHSTATS")
         finally:
-            self.mut.release()
+            self._mut.release()
