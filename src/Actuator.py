@@ -432,8 +432,8 @@ class Actuator(object):
 
     def major_compact(self,i,queue,queuePending):
         logging.info('Thread '+str(i) +'to compact created!')
-        while True:
 
+        while True:
             toCompact = queue.get(True,None)
             logging.info('Thread '+str(i) +' is starting again to compact!')
 
@@ -455,6 +455,7 @@ class Actuator(object):
                     #for region in machines_to_regions[rserver]:
                     for a in sorted_regions:
                         region = a[0]
+                        self._stats.refreshStats(False)
                         rserver_stats = self._stats.getRegionServerStats(rserver)
                         locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
                         if (int(locality) < 95):
