@@ -23,6 +23,7 @@ def main():
     logging.info('MeT in business.')
     stats = Stats.Stats()
     decision_maker = DecisionMaker.DecisionMaker(stats)
+    previousRegionStats = {}
 
     #Main loop
     while running:
@@ -41,14 +42,16 @@ def main():
         if doStuff:
             logging.info('Going to process cluster status.')
 
-            decision_maker.cycle(False)
+            decision_maker.cycle(False,previousRegionStats)
 
             doStuff = False
             ran = 0
             stats.resetStats()
             runs = runs - 1
             logging.info('Finished round.')
+            previousRegionStats = stats.getRegionStats()
             time.sleep(main_config.sleeptime)
+
 
 
         if runs == 0:

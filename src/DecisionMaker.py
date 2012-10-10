@@ -19,6 +19,7 @@ class DecisionMaker(object):
         #current state of the system - initially is empty
         self._machine_type = {}
         self._current_config = {}
+
         #DECISION MAKER PARAMETERS
         self._CPU_IDLE_MIN = decisionmaker_config.cpu_idle_min
         self._IO_WAIT_MAX = decisionmaker_config.io_wait_max
@@ -38,11 +39,23 @@ class DecisionMaker(object):
             res = True
         return res
 
-    def tagRegion(self,rstats):
+    def tagRegion(self,rstats,previousrstats=None):
         tag = 'rw'
-        scantsize = float(rstats[2])
-        reads = float(rstats[0])
-        writes = float(rstats[1])
+        if previousrstats == None:
+            scantsize = float(rstats[2])
+            reads = float(rstats[0])
+            writes = float(rstats[1])
+        else:
+            scantsize = float(rstats[2]) - float(previousrstats[2])
+            reads = float(rstats[0]) -  float(previousrstats[0])
+            writes = float(rstats[1]) - float(previousrstats[1])
+            if scantsize < 0:
+                scantsize = float(rstats[2])
+            if reads < 0:
+                reads = float(rstats[0])
+            if writes < 0:
+                writes = float(rstats[1])
+
         totalreqs = reads + writes
 
         if reads == 0.0:
@@ -78,7 +91,7 @@ class DecisionMaker(object):
             return False
 
     #ASSIGN MACHINES TO TYPES OF HBASE NODE CONFIGURATIONS
-    def tagging(self,regionStats,nregionservers,typeDying={}):
+    def tagging(self,regionStats,previousRegionStats,nregionservers,typeDying={}):
 
         regionTags = {}
         tag_count = {'rw':0,'s':0,'r':0,'w':0}
@@ -88,7 +101,10 @@ class DecisionMaker(object):
         #tag each region according to request patterns
         for region in regionStats.keys():
             if not region.startswith('-ROOT') and not region.startswith('.META'):
-                tag_,reqs = self.tagRegion(regionStats[region])
+                if previousRegionStats == {}:
+                    tag_,reqs = self.tagRegion(regionStats[region])
+                else:
+                    tag_,reqs = self.tagRegion(regionStats[region],previousRegionStats[region])
                 regionTags[region] = (tag_,reqs)
                 tag_count[tag_] = tag_count[tag_] + 1
                 nregions = nregions + 1
@@ -411,7 +427,7 @@ class DecisionMaker(object):
     #MAIN METHOD -----------------------------------------------------------------------------------------------------
 
 
-    def cycle(self,bigbang):
+    def cycle(self,bigbang,previousRegionStats):
 
         regionServerList = self._stats.getRegionServers()
 
@@ -440,7 +456,7 @@ class DecisionMaker(object):
         if actionNeeded and self._reconfigure:
             nregionservers = self._stats.getNumberRegionServers()
             regionStats = self._stats.getRegionStats()
-            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers,dyingType)
+            tagged_machines,tagged_regions = self.tagging(regionStats,previousRegionStats,nregionservers,dyingType)
             #going for ASSIGNMENT ALGORITHM
             readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
             #define which physical machine is going to accomodate which config (function 'f')
@@ -463,7 +479,7 @@ class DecisionMaker(object):
             logging.info("New machines detected. Going for configs.")
             regionStats = self._stats.getRegionStats()
             #GOING FOR CONFIG WITH NEW MACHINES
-            tagged_machines,tagged_regions = self.tagging(regionStats,nregionservers,dyingType)
+            tagged_machines,tagged_regions = self.tagging(regionStats,previousRegionStats,nregionservers,dyingType)
             #going for ASSIGNMENT ALGORITHM
             readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
             #define which physical machine is going to accomodate which config (function 'f')
