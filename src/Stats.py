@@ -7,6 +7,7 @@ import MonitorVms
 import monitor_config
 #from threading import Thread
 import threading
+import sys
 
 class Stats(object):
 
@@ -99,6 +100,6 @@ class Stats(object):
                 logging.info('Stats refreshed. Servers: '+str(self._clusterHBase))
 
         except:
-            logging.error("ERROR IN REFRESHSTATS")
+            logging.error("ERROR IN REFRESHSTATS_: "+str(sys.exc_info()[0]))
         finally:
             self._lock.release()
