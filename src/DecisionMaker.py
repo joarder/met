@@ -12,6 +12,7 @@ class DecisionMaker(object):
 
     def __init__(self,stats):
         self._machtoadd = 1
+        self._machtoaddBefore = 1 #set to 0 if Fibonacci sequence from the beggining
         self._reconfigure = True
         self._stats = stats
         self._actuator = Actuator.Actuator(self._stats)
@@ -468,9 +469,11 @@ class DecisionMaker(object):
             #define which physical machine is going to accomodate which config (function 'f')
             self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
 
-            #Update control vars
-            if self._machtoadd <2:
-                self._machtoadd = self._machtoadd * 2
+
+            #Update control vars; Fibonnacci sequence to add machines
+            aux = self._machtoadd
+            self._machtoadd = self._machtoadd + self._machtoaddBefore
+            self._machtoaddBefore = aux
             self._reconfigure = False
 
         else:

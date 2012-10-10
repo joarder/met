@@ -193,6 +193,19 @@ class Actuator(object):
         logging.info('machine_to_regions:'+str(machines_to_regions))
         #NOT FIRST RECONFIGURATION
         if current_config != {}:
+
+            for machine in machines_to_regions.keys():
+                if machine in current_config.keys():
+                    newregions = {}
+                    regions = machines_to_regions[machine]
+                    for nregion in regions:
+                        if nregion not in current_config[machine]:
+                            #newregions.append(nregion)
+                            newregions.update({nregion:regions[nregion]})
+                    machines_to_regions[machine] = newregions
+                    logging.info('machines_to_regions after current_config'+str(machines_to_regions[machine]))
+
+
             #MOVING REGIONS INTO PLACE
             for rserver in machines_to_regions:
                 for region in machines_to_regions[rserver]:
@@ -209,16 +222,6 @@ class Actuator(object):
                             logging.error('ERROR:'+str(err))
                         logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
 
-            for machine in machines_to_regions.keys():
-                if machine in current_config.keys():
-                    newregions = {}
-                    regions = machines_to_regions[machine]
-                    for nregion in regions:
-                        if nregion not in current_config[machine]:
-                            #newregions.append(nregion)
-                            newregions.update({nregion:regions[nregion]})
-                    machines_to_regions[machine] = newregions
-                    logging.info('machines_to_regions after current_config'+str(machines_to_regions[machine]))
 
             for regions_to_move in machines_to_regions:
                 logging.info('Regions_to_move: '+str(regions_to_move))
