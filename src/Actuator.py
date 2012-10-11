@@ -360,7 +360,7 @@ class Actuator(object):
         nins = []
         for ins in mInstances:
             nins.append(ins.public_dns_name)
-        lista = ["master","10.0.108.16","10.0.108.19"]
+        lista = ["master","10.0.108.16","10.0.108.19","10.0.108.11"]
         lista.extend(nins)
         for node in lista:
             transport = paramiko.Transport((node, 22))
