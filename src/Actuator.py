@@ -474,7 +474,7 @@ class Actuator(object):
                             #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
                             if not region.startswith('load') and not region.startswith('len'):
                                 try:
-                                    logging.info('Major compact of: '+str(region)+' with locality: '+locality)
+                                    logging.info('Major compact of: '+str(region)+' with locality: '+str(locality))
                                     self._metglue.majorCompact(region)
                                     #time.sleep(2)
                                     while(self.isBusyCompacting(rserver)):
