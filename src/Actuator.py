@@ -363,6 +363,7 @@ class Actuator(object):
         lista = ["master","10.0.108.16","10.0.108.19","10.0.108.11"]
         lista.extend(nins)
         lista.extend(self._eucacluster.describe_instances())
+        logging.info("Eucacluster: "+str(self._eucacluster.describe_instances()))
         for node in lista:
             transport = paramiko.Transport((node, 22))
             try:
