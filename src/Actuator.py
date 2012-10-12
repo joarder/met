@@ -361,9 +361,17 @@ class Actuator(object):
         for ins in mInstances:
             nins.append(ins.public_dns_name)
         lista = ["master","10.0.108.16","10.0.108.19","10.0.108.11"]
-        lista.extend(nins)
-        lista.extend(self._eucacluster.describe_instances())
-        logging.info("Eucacluster: "+str(self._eucacluster.describe_instances()))
+        #lista.extend(nins)
+
+        rss = []
+        instances = self._eucacluster.describe_instances()
+        for rs in instances:
+            if (rs.name.startswith("region")):
+                rss.append(rs.public_dns_name)
+
+        lista.extend(rss)
+        logging.info("RS para envivar o hosts: "+str(lista))
+
         for node in lista:
             transport = paramiko.Transport((node, 22))
             try:
