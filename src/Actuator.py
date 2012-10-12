@@ -370,7 +370,6 @@ class Actuator(object):
                 rss.append(rs.public_dns_name)
 
         lista.extend(rss)
-        logging.info("RS para envivar o hosts: "+str(lista))
 
         for node in lista:
             transport = paramiko.Transport((node, 22))
@@ -475,7 +474,7 @@ class Actuator(object):
                             #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
                             if not region.startswith('load') and not region.startswith('len'):
                                 try:
-                                    logging.info('Major compact of: '+str(region))
+                                    logging.info('Major compact of: '+str(region)+' with locality: '+locality)
                                     self._metglue.majorCompact(region)
                                     #time.sleep(2)
                                     while(self.isBusyCompacting(rserver)):
