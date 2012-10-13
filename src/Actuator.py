@@ -219,9 +219,10 @@ class Actuator(object):
                                 self._metglue.move(region,ser,False)
                                 while(self.isBusy()):
                                     time.sleep(2)
+                            logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
                         except Exception, err:
                             logging.error('ERROR:'+str(err))
-                        logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
+
 
 
             for regions_to_move in machines_to_regions:
@@ -249,9 +250,10 @@ class Actuator(object):
                                 self._metglue.move(region,ser,False)
                                 while(self.isBusy()):
                                     time.sleep(2)
+                            logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
                         except Exception, err:
                             logging.error('ERROR:'+str(err))
-                        logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
+
 
 
             logging.info('machine_type:'+str(machine_type))
