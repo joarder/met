@@ -245,7 +245,9 @@ class Actuator(object):
                         try:
                             self._metglue.move(region,ser,False)
                             while(self.isBusy()):
+                                logging.info('waiting on move to finish')
                                 time.sleep(2)
+                            time.sleep(10)
                             if region not in self._metglue.getRegionsPerServer(ser):
                                 self._metglue.move(region,ser,False)
                                 while(self.isBusy()):
