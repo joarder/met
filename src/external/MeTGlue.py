@@ -127,7 +127,7 @@ class MeTGlue(object):
 
             for serverName in serverNames.iterator():
 
-                    serverLoad = self.__hbaseAdmin.getClusterStatus().getLoad(serverName)
+                serverLoad = self.__hbaseAdmin.getClusterStatus().getLoad(serverName)
                 if verbose:
                     print 'Server ', serverName, ' addr: ', serverName.getHostAndPort(),  ' has ', serverLoad.getNumberOfRequests(), ' requests'
 
