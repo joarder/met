@@ -188,6 +188,7 @@ class Actuator(object):
     #Distribute (move) regions to regionservers
     def distributeRegionsPerRS(self,machines_to_regions=None,machine_type=None,current_config={}):
         longServerNames = self._stats.getServerLongNames()
+        logging.info('longServerNames: '+str(longServerNames))
         logging.info('distributeRegionsPerRS: '+str(machines_to_regions))
 
         logging.info('machine_to_regions:'+str(machines_to_regions))
@@ -247,6 +248,7 @@ class Actuator(object):
                             while(self.isBusy()):
                                 logging.info('waiting on move to finish')
                                 time.sleep(2)
+                            logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
                             if region not in self._metglue.getRegionsPerServer(ser):
                                 self._metglue.move(region,ser,False)
                                 while(self.isBusy()):
