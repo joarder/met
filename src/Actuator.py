@@ -222,7 +222,7 @@ class Actuator(object):
                             logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
                         except Exception, err:
                             logging.error('ERROR:'+str(err))
-
+                        logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
 
 
             for regions_to_move in machines_to_regions:
@@ -247,7 +247,6 @@ class Actuator(object):
                             while(self.isBusy()):
                                 logging.info('waiting on move to finish')
                                 time.sleep(2)
-                            time.sleep(10)
                             if region not in self._metglue.getRegionsPerServer(ser):
                                 self._metglue.move(region,ser,False)
                                 while(self.isBusy()):
