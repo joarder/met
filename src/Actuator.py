@@ -189,7 +189,6 @@ class Actuator(object):
     def distributeRegionsPerRS(self,machines_to_regions=None,machine_type=None,current_config={}):
         self._stats.refreshStats(False)
         longServerNames = self._stats.getServerLongNames()
-        logging.info('longServerNames: '+str(longServerNames))
         logging.info('distributeRegionsPerRS: '+str(machines_to_regions))
 
         logging.info('machine_to_regions:'+str(machines_to_regions))
@@ -224,7 +223,6 @@ class Actuator(object):
                             logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
                         except Exception, err:
                             logging.error('ERROR:'+str(err))
-                        logging.info('Moving region '+ str(region)+ ' to '+ str(ser)+ ' DONE.')
 
 
             for regions_to_move in machines_to_regions:
