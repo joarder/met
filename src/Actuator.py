@@ -450,6 +450,7 @@ class Actuator(object):
             logging.info('Thread '+str(i) +' is starting again to compact!')
 
             self._stats.refreshStats(False)
+            time.sleep(1)
             logging.info('Thread getting from queue:'+str(toCompact))
             machine_type = toCompact.pop('machine_type')
             machines_to_regions = toCompact
@@ -468,6 +469,7 @@ class Actuator(object):
                     for a in sorted_regions:
                         region = a[0]
                         self._stats.refreshStats(False)
+                        time.sleep(1)
                         rserver_stats = self._stats.getRegionServerStats(rserver)
                         locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
                         if (int(locality) < 95):

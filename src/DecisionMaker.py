@@ -495,7 +495,9 @@ class DecisionMaker(object):
         else:
             logging.info('Cluster is healthy. Nothing to do.')
             self._machtoadd = 1
+            self._machtoaddBefore = 1
             self._reconfigure = True
+            #self._reconfigure = False #only reconf once
 
         #for reg in self._stats.getRegionServers():
         while(self._actuator.isBusyCompactingFinal()):
