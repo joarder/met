@@ -455,7 +455,7 @@ class Actuator(object):
             toCompact = queue.get(True,None)
             logging.info('Thread '+str(i) +' is starting again to compact!')
 
-            time.sleep(1)
+            time.sleep(2)
             self._stats.refreshStats(False)
 
             logging.info('Thread getting from queue:'+str(toCompact))
