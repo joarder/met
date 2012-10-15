@@ -22,6 +22,7 @@ class DecisionMaker(object):
 
         #DECISION MAKER PARAMETERS
         self._CPU_IDLE_MIN = decisionmaker_config.cpu_idle_min
+        self._CPU_IDLE_MAX = decisionmaker_config.cpu_idle_max
         self._IO_WAIT_MAX = decisionmaker_config.io_wait_max
         self._CRITICAL_PERC = decisionmaker_config.critialStatePercentage
         self._READ_WRITE_DISTANCE_MIN = decisionmaker_config.read_write_distance_min
@@ -36,6 +37,14 @@ class DecisionMaker(object):
         #condition that evaluates if the RegionServer is overloaded
         if float(rstats['cpu_idle']) < self._CPU_IDLE_MIN or float(rstats['cpu_wio']) > self._IO_WAIT_MAX:
             logging.info('cpu_idle:'+str(rstats['cpu_idle'])+" cpu_wio:"+str(rstats['cpu_wio']))
+            res = True
+        return res
+
+    def isRegionServerExtra(self,rstats):
+        res = False
+        #condition that evaluates if the RegionServer is overloaded
+        if float(rstats['cpu_idle']) > self._CPU_IDLE_MAX:
+            logging.info('checking extra -> cpu_idle:'+str(rstats['cpu_idle'])+" cpu_wio:"+str(rstats['cpu_wio']))
             res = True
         return res
 
@@ -106,7 +115,8 @@ class DecisionMaker(object):
                 else:
                     tag_,reqs = self.tagRegion(regionStats[region],previousRegionStats[region])
                 regionTags[region] = (tag_,reqs)
-                tag_count[tag_] = tag_count[tag_] + 1
+                if (reqs>0):
+                    tag_count[tag_] = tag_count[tag_] + 1
                 nregions = nregions + 1
 
         #calculate the number of machines to assign to each tag
@@ -296,81 +306,86 @@ class DecisionMaker(object):
 
         if len(self._current_config)!=0:
             #NEED TO MINIMIZE MOVES
-            if len(self._current_config) <= newNMachines:
-                #NEW MACHINES TO ACCOMODATE
-                newmachines = []
-                for item in available_machines:
-                    if item not in self._machine_type.keys():
-                        newmachines.append(item)
-                logging.info('newmachines:'+str(newmachines))
 
-                for item in readmachines.keys():
-                    physical = self.getClosest(readmachines[item],'r',cur)
-                    if not physical is None:
-                        self._machine_type[physical] = 'r'
-                        result[physical] = readmachines[item]
-                        del creadmachines[item]
-                        del cur[physical]
+            newmachines = []
+            for item in available_machines:
+                if item not in self._machine_type.keys():
+                    newmachines.append(item)
+            logging.info('newmachines:'+str(newmachines))
 
-                for item in writemachines.keys():
-                    physical = self.getClosest(writemachines[item],'w',cur)
-                    if not physical is None:
-                        self._machine_type[physical] = 'w'
-                        result[physical] = writemachines[item]
-                        del cwritemachines[item]
-                        del cur[physical]
-
-                for item in scanmachines.keys():
-                    physical = self.getClosest(scanmachines[item],'s',cur)
-                    if not physical is None:
-                        self._machine_type[physical] = 's'
-                        result[physical] = scanmachines[item]
-                        del cscanmachines[item]
-                        del cur[physical]
-
-                for item in rwmachines.keys():
-                    physical = self.getClosest(rwmachines[item],'rw',cur)
-                    if not physical is None:
-                        self._machine_type[physical] = 'rw'
-                        result[physical] = rwmachines[item]
-                        del crwmachines[item]
-                        del cur[physical]
-
-                #at this point every machine was matched to a possible assignment
-                #next step is to check for missing assignments and possible change of configs
-                machinesleft = cur.keys()+newmachines
-
-                for item in creadmachines.keys():
-                    physical = machinesleft.pop()
+            for item in readmachines.keys():
+                physical = self.getClosest(readmachines[item],'r',cur)
+                if not physical is None:
                     self._machine_type[physical] = 'r'
-                    self._actuator.configureServer(physical,'r', self._current_config.keys())
                     result[physical] = readmachines[item]
+                    del creadmachines[item]
+                    del cur[physical]
 
-                for item in cwritemachines.keys():
-                    physical = machinesleft.pop()
+            for item in writemachines.keys():
+                physical = self.getClosest(writemachines[item],'w',cur)
+                if not physical is None:
                     self._machine_type[physical] = 'w'
-                    self._actuator.configureServer(physical,'w', self._current_config.keys())
                     result[physical] = writemachines[item]
+                    del cwritemachines[item]
+                    del cur[physical]
 
-                for item in cscanmachines.keys():
-                    physical = machinesleft.pop()
+            for item in scanmachines.keys():
+                physical = self.getClosest(scanmachines[item],'s',cur)
+                if not physical is None:
                     self._machine_type[physical] = 's'
-                    self._actuator.configureServer(physical,'s', self._current_config.keys())
                     result[physical] = scanmachines[item]
+                    del cscanmachines[item]
+                    del cur[physical]
 
-                for item in crwmachines.keys():
-                    physical = machinesleft.pop()
+            for item in rwmachines.keys():
+                physical = self.getClosest(rwmachines[item],'rw',cur)
+                if not physical is None:
                     self._machine_type[physical] = 'rw'
-                    self._actuator.configureServer(physical,'rw', self._current_config.keys())
                     result[physical] = rwmachines[item]
+                    del crwmachines[item]
+                    del cur[physical]
+
+            #at this point every machine was matched to a possible assignment
+            #next step is to check for missing assignments and possible change of configs
+            machinesleft = cur.keys()+newmachines
+
+            for item in creadmachines.keys():
+                physical = machinesleft.pop()
+                self._machine_type[physical] = 'r'
+                self._actuator.configureServer(physical,'r', self._current_config.keys())
+                result[physical] = readmachines[item]
+
+            for item in cwritemachines.keys():
+                physical = machinesleft.pop()
+                self._machine_type[physical] = 'w'
+                self._actuator.configureServer(physical,'w', self._current_config.keys())
+                result[physical] = writemachines[item]
+
+            for item in cscanmachines.keys():
+                physical = machinesleft.pop()
+                self._machine_type[physical] = 's'
+                self._actuator.configureServer(physical,'s', self._current_config.keys())
+                result[physical] = scanmachines[item]
+
+            for item in crwmachines.keys():
+                physical = machinesleft.pop()
+                self._machine_type[physical] = 'rw'
+                self._actuator.configureServer(physical,'rw', self._current_config.keys())
+                result[physical] = rwmachines[item]
 
 
-                #MOVE REGIONS INTO PLACE IF NEEDED
-                self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
+            #MOVE REGIONS INTO PLACE IF NEEDED
+            self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
 
-            else:
-                #ATTENTION: CURRENTLY NOT CONSIDERING THE CASE WHERE THERE ARE FEWER MACHINES!
-                logging.info( 'Machines removed... DOING NOTHING')
+            if len(self._current_config) > newNMachines:
+                #FEWER MACHINES!
+                assignedReg = result.keys()
+                for regg in self._current_config.keys():
+                    if regg not in assignedReg:
+                        logging.info("Machine "+str(regg)+" going to be removed")
+                        self._actuator.stopServer(regg)
+                        self._actuator.tiramolaRemoveMachine(regg)
+
 
         else:
             #FIRST RECONFIGURATION
@@ -430,7 +445,7 @@ class DecisionMaker(object):
     def cycle(self,bigbang,previousRegionStats):
 
         regionServerList = self._stats.getRegionServers()
-
+        extraMachines = []
         actionNeeded = False
         machdying = 0
         nmach = 0
@@ -438,12 +453,15 @@ class DecisionMaker(object):
         #check if any of the regionServers is dying
         for rsKey in regionServerList:
             dying = self.isRegionServerDying(self._stats.getRegionServerStats(rsKey))
+            extra = self.isRegionServerExtra(self._stats.getRegionServerStats(rsKey))
             logging.info(rsKey+' '+" is dying? "+' '+str(dying))
             if dying:
                 machdying = machdying + 1
                 if self._machine_type.has_key(rsKey):
                     dyingType[self._machine_type[rsKey]]='True'
                 actionNeeded = True
+            if extra:
+                extraMachines.append(rsKey)
             nmach = nmach + 1
 
         #CHECK IF WE NEED TO ADD/REMOVE MACHINES to address critical state
@@ -494,6 +512,15 @@ class DecisionMaker(object):
 
         else:
             logging.info('Cluster is healthy. Nothing to do.')
+            if (len(extraMachines) > 0):
+                #REMOVING INSTANCE
+                nregionservers = self._stats.getNumberRegionServers() - 1
+                regionStats = self._stats.getRegionStats()
+                tagged_machines,tagged_regions = self.tagging(regionStats,previousRegionStats,nregionservers,dyingType)
+                readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
+                self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
+
+
             self._machtoadd = 1
             self._machtoaddBefore = 1
             #self._reconfigure = True

@@ -108,7 +108,19 @@ class Actuator(object):
         ssh.close()
         logging.info('Server '+str(host)+' restarted ('+str(stdout)+').')
 
+    def stopServer(self,host):
+        ssh = paramiko.SSHClient()
+        ssh.load_system_host_keys()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            ssh.connect(host, username=self._USERNAME, password=self._PASSWORD)
+        except:
+            logging.info("Unable to connect to node  " + str(host))
 
+        stdin, stdout, stderr = ssh.exec_command('/opt/hbase-0.92.0-cdh4b1-rmv/bin/hbase-daemon.sh stop regionserver')
+        logging.info(str(stdout.readlines()))
+        ssh.close()
+        logging.info('Server '+str(host)+' stopped ('+str(stdout)+').')
 
     def configureServer(self,server,servertag,available_machines=None):
         #SERVER CONFIGURATION
@@ -320,6 +332,18 @@ class Actuator(object):
 #                            logging.error('ERROR:'+str(err))
 #                            #if major_compact then wait a while to get there faster
 #                            #time.sleep(30)
+
+
+    #REMOVE MACHINE
+    def tiramolaRemoveMachine(self,name):
+        instances = self._eucacluster.describe_instances()
+        id = []
+        for instance in instances:
+            if instance.name == name:
+                id.append(instance.id)
+
+        self._eucacluster.terminate_instances(id)
+        logging.info("Removed instance "+str(name)+" with id:"+str(id))
 
     #ADD MACHINE
     def tiramolaAddMachine(self, machtoadd):
