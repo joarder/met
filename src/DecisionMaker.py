@@ -296,6 +296,8 @@ class DecisionMaker(object):
         partialResultConc = {}
         available_machines = self._stats.getRegionServers()
         newNMachines = len(available_machines)
+        removeCheck = len(readmachines) + len(writemachines) + len(scanmachines) + len(rwmachines)
+        logging.info('Machines considered in optimal distribution:'+removeCheck)
 
         creadmachines = copy.deepcopy(readmachines)
         cwritemachines = copy.deepcopy(writemachines)
@@ -377,7 +379,7 @@ class DecisionMaker(object):
             #MOVE REGIONS INTO PLACE IF NEEDED
             self._actuator.distributeRegionsPerRS(result,self._machine_type,self._current_config)
 
-            if len(self._current_config) > newNMachines:
+            if len(self._current_config) > removeCheck:
                 #FEWER MACHINES!
                 assignedReg = result.keys()
                 for regg in self._current_config.keys():
