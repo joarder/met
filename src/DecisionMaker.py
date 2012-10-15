@@ -511,7 +511,7 @@ class DecisionMaker(object):
             self._reconfigure = False
 
         else:
-            logging.info('Cluster is healthy. Nothing to do.')
+            logging.info('Cluster is healthy.')
             if (len(extraMachines) > 0):
                 #REMOVING INSTANCE
                 nregionservers = self._stats.getNumberRegionServers() - 1
