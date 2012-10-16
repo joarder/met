@@ -381,6 +381,9 @@ class DecisionMaker(object):
 
             if len(self._current_config) > removeCheck:
                 #FEWER MACHINES!
+                while(self._actuator.isBusyCompactingFinal()):
+                    logging.info('Waiting for major compact to finish in all regions before stopping any machine.')
+                    time.sleep(20)
                 assignedReg = result.keys()
                 for regg in self._current_config.keys():
                     if regg not in assignedReg:
