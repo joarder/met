@@ -119,6 +119,8 @@ class Actuator(object):
 
         stdin, stdout, stderr = ssh.exec_command('/opt/hbase-0.92.0-cdh4b1-rmv/bin/hbase-daemon.sh stop regionserver')
         logging.info(str(stdout.readlines()))
+        stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor stop')
+        logging.info(str(stdout.readlines()))
         ssh.close()
         logging.info('Server '+str(host)+' stopped ('+str(stdout)+').')
 
@@ -430,6 +432,7 @@ class Actuator(object):
             logging.info(str(stdout.readlines()))
             stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
             logging.info(str(stdout.readlines()))
+            ssh.close()
 
         #RESTART GANGLIA TO FIX THE PROBLEM OF OPENSTACK RUNNING THE DEAMON
 #        logging.info("Restarting ganlgia on Master.")

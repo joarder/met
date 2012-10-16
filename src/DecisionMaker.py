@@ -528,6 +528,7 @@ class DecisionMaker(object):
                 readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
                 self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
                 nregionservers = previousNOfSERVERS
+
                 while(nregionservers==previousNOfSERVERS):
                     logging.info('Waiting for ganglia to forget machines.')
                     self._stats.refreshStats(False)
