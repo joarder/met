@@ -297,7 +297,7 @@ class DecisionMaker(object):
         available_machines = self._stats.getRegionServers()
         newNMachines = len(available_machines)
         removeCheck = len(readmachines) + len(writemachines) + len(scanmachines) + len(rwmachines)
-        logging.info('Machines considered in optimal distribution:'+removeCheck)
+        logging.info('Machines considered in optimal distribution:'+str(removeCheck))
 
         creadmachines = copy.deepcopy(readmachines)
         cwritemachines = copy.deepcopy(writemachines)
