@@ -521,17 +521,17 @@ class DecisionMaker(object):
                 #REMOVING INSTANCE
                 previousNOfSERVERS = self._stats.getNumberRegionServers()
                 #NEED TO REFRESH STATS
-                nregionservers = previousNOfSERVERS
-                while(nregionservers==previousNOfSERVERS):
-                    logging.info('Waiting for ganglia to forget machines.')
-                    self._stats.refreshStats(False)
-                    nregionservers = self._stats.getNumberRegionServers()
+
                 nregionservers = self._stats.getNumberRegionServers() - 1
                 regionStats = self._stats.getRegionStats()
                 tagged_machines,tagged_regions = self.tagging(regionStats,previousRegionStats,nregionservers,dyingType)
                 readmachines,writemachines,scanmachines,rwmachines = self.minimizemakespan(tagged_machines,tagged_regions)
                 self.getPhysical(readmachines,writemachines,scanmachines,rwmachines)
-
+                nregionservers = previousNOfSERVERS
+                while(nregionservers==previousNOfSERVERS):
+                    logging.info('Waiting for ganglia to forget machines.')
+                    self._stats.refreshStats(False)
+                    nregionservers = self._stats.getNumberRegionServers()
 
             self._machtoadd = 1
             self._machtoaddBefore = 1
