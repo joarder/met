@@ -519,6 +519,13 @@ class DecisionMaker(object):
             logging.info('Cluster is healthy.')
             if (len(extraMachines) > 0):
                 #REMOVING INSTANCE
+                previousNOfSERVERS = self._stats.getNumberRegionServers()
+                #NEED TO REFRESH STATS
+                nregionservers = previousNOfSERVERS
+                while(nregionservers==previousNOfSERVERS):
+                    logging.info('Waiting for ganglia to forget machines.')
+                    self._stats.refreshStats(False)
+                    nregionservers = self._stats.getNumberRegionServers()
                 nregionservers = self._stats.getNumberRegionServers() - 1
                 regionStats = self._stats.getRegionStats()
                 tagged_machines,tagged_regions = self.tagging(regionStats,previousRegionStats,nregionservers,dyingType)
