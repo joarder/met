@@ -46,10 +46,10 @@ def main():
 
             doStuff = False
             ran = 0
+            previousRegionStats = stats.getRegionStats()
             stats.resetStats()
             runs = runs - 1
             logging.info('Finished round.')
-            previousRegionStats = stats.getRegionStats()
             time.sleep(main_config.sleeptime)
 
 

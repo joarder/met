@@ -117,7 +117,7 @@ class DecisionMaker(object):
                 regionTags[region] = (tag_,reqs)
                 if (reqs>0):
                     tag_count[tag_] = tag_count[tag_] + 1
-                nregions = nregions + 1
+                    nregions = nregions + 1
 
         #calculate the number of machines to assign to each tag
         machines_per_tag = {}
@@ -173,7 +173,7 @@ class DecisionMaker(object):
             machines_per_tag[pt[0]] =  machines_per_tag[pt[0]] + abs(serverdiff)
 
 
-        logging.info('Number of Regions: '+str(nregions))
+        logging.info('Number of Regions with Reqs > 0: '+str(nregions))
         logging.info('Number of RegionServers: '+str(nregionservers))
         logging.info('Machines per tag: '+str(machines_per_tag))
 
