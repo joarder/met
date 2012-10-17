@@ -1,3 +1,24 @@
+'''
+Copyright (c) 2012.
+
+Universidade do Minho
+Francisco Cruz
+Francisco Maia
+Joao Paulo
+Ricardo Vilaca
+Jose Pereira
+Rui Oliveira
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.
+'''
+
 from py4j.java_gateway import JavaGateway
 import time
 import threading
@@ -163,8 +184,6 @@ class MeTGlue(object):
 
                 for regionLoad in serverLoad.getRegionsLoad().keys():
                     if tableNameOrRegionNameString == str(regionLoad):
-                        #print 'found: ', tableNameOrRegionNameString, ' regionLoad: ', regionLoad
-                        #print 'serverName: ', serverName
                         break
 
         return serverName,serverLoad.getStorefileSizeInMB()
@@ -175,12 +194,9 @@ class MeTGlue(object):
         Moves the encodedRegionString to the destServerName.
         Both parameters should be strings, conversions are handled internally.
         """
-        #print 'DEBUG: ',regionNameString,' ',regionNameString.split('.')[1],' ',destServerNameString
-        #encodedRegionName = bytearray(regionNameString.split('.')[1])
 
         encodedRegionName = self.__entry.tobytes(regionNameString.split('.')[1])
-        #self.__hbaseAdmin.move(encodedRegionName,destServerNameString.getVersionedBytes())
-        print 'DEBUG: ',encodedRegionName,' ',destServerNameString#.getVersionedBytes()
+        print 'DEBUG: ',encodedRegionName,' ',destServerNameString
         encodedServer = self.__entry.tobytes(str(destServerNameString))
         if verbose:
             print 'Moving. encodedRegion: ', encodedRegionName, ' destServerName: ', destServerNameString

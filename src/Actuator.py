@@ -1,6 +1,24 @@
-import copy
+'''
+Copyright (c) 2012.
 
-__author__ = 'fmaia'
+Universidade do Minho
+Francisco Cruz
+Francisco Maia
+Joao Paulo
+Ricardo Vilaca
+Jose Pereira
+Rui Oliveira
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.
+'''
+import copy
 import logging
 import actuator_config
 import os
@@ -63,12 +81,6 @@ class Actuator(object):
 
     def isBusyCompactingFinal(self):
         if self.queuePending.empty():
-#            logging.info('Queue is empty.')
-#            booleanRS = False
-#            for reg in self._stats.getRegionServers():
-#                booleanAux = self.isBusyCompacting(reg)
-#                booleanRS = booleanRS or booleanAux
-#            return booleanRS
             return False
         else:
             return True
@@ -279,62 +291,6 @@ class Actuator(object):
             self.queue.put(machines_to_regions)
             self.queuePending.put(True)
 
-#        self._stats.refreshStats(False)
-#        for rserver in machines_to_regions:
-#            rserver_stats = self._stats.getRegionServerStats(rserver)
-#            locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
-#            logging.info('Server '+str(rserver)+' has locality of:'+str(locality))
-#
-#            if (int(locality) < 70 and machine_type[rserver]=="w") or (int(locality) < 90 and machine_type[rserver]!="w"):
-#                #major_compact first the hotspot regions
-#                sorted_regions = sorted(machines_to_regions[rserver].iteritems(), key=operator.itemgetter(1))
-#                sorted_regions.reverse()
-#                #put in queue the sorted region
-#                self.queue.put(sorted_regions)
-#                #for region in machines_to_regions[rserver]:
-#                for a in sorted_regions:
-#                    region = a[0]
-#                    #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
-#                    if not region.startswith('load') and not region.startswith('len'):
-#                        try:
-#                            logging.info('Major compact of: '+str(region))
-#                            self._metglue.majorCompact(region)
-#                            time.sleep(2)
-#                        except Exception, err:
-#                            logging.error('ERROR:'+str(err))
-#                #if major_compact then wait a while to get there faster
-#                time.sleep(30)
-
-
-#    def majorCompact(self,machines_to_regions=None,machine_type=None):
-#        thread.start_new_thread(self.majorCompactThread.act, (action,self.acted)) #no init
-#        self._stats.refreshStats(False)
-#        for rserver in machines_to_regions:
-#            rserver_stats = self._stats.getRegionServerStats(rserver)
-#            locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
-#            logging.info('Server '+str(rserver)+' has locality of:'+str(locality))
-#
-#            if (int(locality) < 70 and machine_type[rserver]=="w") or (int(locality) < 90 and machine_type[rserver]!="w"):
-#                #major_compact first the hotspot regions
-#                sorted_regions = sorted(machines_to_regions[rserver].iteritems(), key=operator.itemgetter(1))
-#                sorted_regions.reverse()
-#                #for region in machines_to_regions[rserver]:
-#                for a in sorted_regions:
-#                    region = a[0]
-#                    #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
-#                    if not region.startswith('load') and not region.startswith('len'):
-#                        try:
-#                            logging.info('Major compact of: '+str(region))
-#                            self._metglue.majorCompact(region)
-#                            #time.sleep(2)
-#                            while(self.isBusyCompacting(rserver)):
-#                                logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
-#                                time.sleep(10)
-#                        except Exception, err:
-#                            logging.error('ERROR:'+str(err))
-#                            #if major_compact then wait a while to get there faster
-#                            #time.sleep(30)
-
 
     #REMOVE MACHINE
     def tiramolaRemoveMachine(self,name):
@@ -375,17 +331,11 @@ class Actuator(object):
             except:
                 logging.error("Unable to connect to node  " + str(instance.public_dns_name))
 
-            #ADDED THIS TO FIX GANGLIA PROBLEM
-            #stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor stop')
-            #logging.info(str(stdout.readlines()))
-
             stdin, stdout, stderr = ssh.exec_command('echo \"'+instance.name+"\" > /etc/hostname")
             logging.info(str(stdout.readlines()))
             stdin, stdout, stderr = ssh.exec_command('hostname \"'+instance.name+"\"")
             logging.info(str(stdout.readlines()))
             hosts.write(instance.private_dns_name + "\t" + instance.name +"\n")
-            #stdin, stdout, stderr = ssh.exec_command('reboot')
-            #mInstances = self._eucacluster.block_until_running([instance])
 
         hosts.close()
 
@@ -393,7 +343,6 @@ class Actuator(object):
         for ins in mInstances:
             nins.append(ins.public_dns_name)
         lista = ["master","10.0.108.16","10.0.108.19","10.0.108.11"]
-        #lista.extend(nins)
 
         rss = []
         instances = self._eucacluster.describe_instances()
@@ -434,45 +383,6 @@ class Actuator(object):
             logging.info(str(stdout.readlines()))
             ssh.close()
 
-        #RESTART GANGLIA TO FIX THE PROBLEM OF OPENSTACK RUNNING THE DEAMON
-#        logging.info("Restarting ganlgia on Master.")
-#        tries=0
-#        while tries<10:
-#            try:
-#                tries+=1
-#                ssh.connect("master", username='root', password='123456')
-#                break
-#            except:
-#                logging.error("Unable to connect to node  " + "master"+ " after "+str(tries)+" attempts.")
-#        stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
-#        logging.info(str(stdout.readlines()))
-#        ssh.close()
-#
-#        ssh = paramiko.SSHClient()
-#        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#        for clusterkey in self._stats.getRegionServers():
-#            if not clusterkey.endswith("master"):
-#                logging.info("Restarting ganlgia on Slave:"+str(clusterkey))
-#                tries=0
-#                while tries<10:
-#                    try:
-#                        tries+=1
-#                        ssh.connect(clusterkey, username=self._USERNAME, password=self._PASSWORD)
-#                        break
-#                    except:
-#                        logging.error("Unable to connect to node  " + str(clusterkey)+ " after "+str(tries)+" attempts.")
-#                stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
-#                logging.info(str(stdout.readlines()))
-#                ssh.close()
-#        for instance in mInstances:
-#            try:
-#                ssh.connect(instance.public_dns_name, username=self._USERNAME, password=self._PASSWORD)
-#                stdin, stdout, stderr = ssh.exec_command('/etc/init.d/ganglia-monitor restart')
-#                logging.info(str(stdout.readlines()))
-#                ssh.close()
-#            except:
-#                logging.error("Unable to connect to node  " + str(instance.public_dns_name))
-#
 
 
     def major_compact(self,i,queue,queuePending):
@@ -497,9 +407,7 @@ class Actuator(object):
                 if (int(locality) < 70 and machine_type[rserver]=="w") or (int(locality) < 90 and machine_type[rserver]!="w"):
                     #major_compact first the hotspot regions
                     sorted_regions = sorted(machines_to_regions[rserver].iteritems(), key=operator.itemgetter(1))
-                    #sorted_regions.reverse()
 
-                    #for region in machines_to_regions[rserver]:
                     for a in sorted_regions:
                         region = a[0]
                         time.sleep(1)
@@ -507,25 +415,17 @@ class Actuator(object):
                         rserver_stats = self._stats.getRegionServerStats(rserver)
                         locality = rserver_stats['hbase.regionserver.hdfsBlocksLocalityIndex']
                         if (int(locality) < 95):
-                            #if not region.startswith('-ROOT') and not region.startswith('.META') and not region.startswith('load') and not region.startswith('len'):
                             if not region.startswith('load') and not region.startswith('len'):
                                 try:
                                     logging.info('Major compact of: '+str(region)+' with locality: '+str(locality))
                                     self._metglue.majorCompact(region)
-                                    #time.sleep(2)
                                     while(self.isBusyCompacting(rserver)):
                                         logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
                                         time.sleep(20)
                                 except Exception, err:
                                     logging.error('ERROR:'+str(err))
-                        #if major_compact then wait a while to get there faster
-                        #time.sleep(30)
-#                    while(self.isBusyCompacting(rserver)):
-#                        logging.info('Waiting for major compact to finish in '+str(rserver)+'...')
-#                        time.sleep(20)
             queuePending.get(True,None)
             queue.task_done()
             queuePending.task_done()
 
 
-#def major_compact_sync(self,machines_to_regions):

@@ -1,3 +1,23 @@
+'''
+Copyright (c) 2012.
+
+Universidade do Minho
+Francisco Cruz
+Francisco Maia
+Joao Paulo
+Ricardo Vilaca
+Jose Pereira
+Rui Oliveira
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.
+'''
 import copy
 import logging
 import math
@@ -42,7 +62,6 @@ class DecisionMaker(object):
 
     def isRegionServerExtra(self,rstats):
         res = False
-        #condition that evaluates if the RegionServer is overloaded
         if float(rstats['cpu_idle']) > self._CPU_IDLE_MAX:
             logging.info('checking extra -> cpu_idle:'+str(rstats['cpu_idle'])+" cpu_wio:"+str(rstats['cpu_wio']))
             res = True
@@ -157,7 +176,6 @@ class DecisionMaker(object):
 
         elif serverdiff<0 :
             #need to add machines
-            #machines_per_tag['rw'] = machines_per_tag['rw'] + abs(serverdiff)
             temp = sorted(machines_per_tag_float.iteritems(), key=operator.itemgetter(1))
             temp.pop()
             pt = None
@@ -434,9 +452,6 @@ class DecisionMaker(object):
                 partialResult[physical] = writemachines[item]
                 self._actuator.distributeRegionsPerRS(partialResult,self._machine_type)
                 partialResult = {}
-
-
-            #self._actuator.majorCompact(partialResultConc,self._machine_type)
 
 
         logging.info('FINAL DISTRIBUTION:'+str(result))

@@ -1,10 +1,28 @@
+'''
+Copyright (c) 2012.
+
+Universidade do Minho
+Francisco Cruz
+Francisco Maia
+Joao Paulo
+Ricardo Vilaca
+Jose Pereira
+Rui Oliveira
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.
+'''
 import logging
 import main_config
 import time
 import DecisionMaker
 import Stats
-
-__author__ = 'fmaia'
 
 def main():
 
@@ -18,7 +36,7 @@ def main():
     #RAMP UP
     if main_config.rampup:
         logging.info("Now sleeping for ramp up time of 240s.")
-        time.sleep(240)
+        time.sleep(main_config.rampuptime)
 
     logging.info('MeT in business.')
     stats = Stats.Stats()

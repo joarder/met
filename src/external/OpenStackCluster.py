@@ -1,29 +1,36 @@
 '''
-ck
-Created on May 7, 2012
+Copyright (c) 2012.
 
-@author: rmpvilaca
+Universidade do Minho
+Francisco Cruz
+Francisco Maia
+Joao Paulo
+Ricardo Vilaca
+Jose Pereira
+Rui Oliveira
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.
 '''
 
 
 from novaclient.v1_1 import client
-import sys, os, time
-import Utils
+import sys, time
 import commands
 
 class OpenStackCluster(object):
-    '''
-    This class holds all instances that take part in the virtual cluster.
-    It can create and stop new instances - and working in conjuction with the
-    db specific classes set up various environments. 
-    '''
+
 
 
     def __init__(self):
-        '''
-        Constructor
-        '''
-        self.utils = Utils.Utils()
+        print 'OpenStackCluster started.'
+
 
 
     def describe_instances(self, state=None, pattern=None):
@@ -245,14 +252,10 @@ class OpenStackCluster(object):
 	    print "Waiting for", len(tmpinstances), "instances."
 	    sys.stdout.flush()
 	    all_running_instances = self.describe_instances("ACTIVE")
-	    #print "ALL",str(all_running_instances)
-	    #print "TMP",str(tmpinstances)
 	    for i in range(0,len(all_running_instances)):
 		for j in range(0,len(tmpinstances)):
 		    ping = commands.getoutput("/bin/ping -q -c 1 " + str(all_running_instances[i].public_dns_name))
 		    nc = commands.getoutput("nc -z  -v "+ str(all_running_instances[i].public_dns_name)+" 22")
-		    #print "IP:",str(all_running_instances[i].public_dns_name),";ping:",ping,";nc:",nc
-		    #print all_running_instances[i].id, all_running_instances[j].id
 		    if (all_running_instances[i].id == tmpinstances[j].id)\
 		       and ping.count('1 received') > 0 and nc.count("succeeded") > 0:
 			tmpinstances.pop(j)
@@ -260,7 +263,6 @@ class OpenStackCluster(object):
 			instances.append(all_running_instances[i])
 			break
 	self.describe_instances()
-	#print "Instance BLOCK:",instances
 	return instances
 
 
