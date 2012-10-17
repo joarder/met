@@ -12,7 +12,7 @@ The current version of MeT is ready to work with HBase and OpenStack.
 # Requirements
 
 ## Java
-    MeT has a small Java module that bridges MeT and HBase.
+    MeT has a Java module to bridge MeT and HBase.
     Such module has the following dependencies:
         - commons-configuration-1.6.jar
         - commons-lang-2.5.jar
@@ -65,6 +65,8 @@ Your feedback is welcome.
 Francisco Cruz (<fmcruz@di.uminho.pt>)
 
 Francisco Maia (<fmaia@di.uminho.pt>)
+
+Miguel Matos (<miguelmatos@di.uminho.pt>)
 
 Ricardo Vilaça (<rmvilaca@di.uminho.pt>)
 

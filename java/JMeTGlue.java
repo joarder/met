@@ -5,6 +5,7 @@ Universidade do Minho
 Francisco Cruz
 Francisco Maia
 Joao Paulo
+Miguel Matos
 Ricardo Vilaca
 Jose Pereira
 Rui Oliveira
