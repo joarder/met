@@ -42,7 +42,8 @@ No need for extra build work.
 # Configuration 
 
 Folder 'config' holds a set of configuration files.
-This should be the only place where you would need to tune MeT.
+Folder 'tmp' holds hbase configuration files that MeT uses and copies to the actual running machines.
+These should be the only places where you would need to tune MeT.
 
 # Usage
 
