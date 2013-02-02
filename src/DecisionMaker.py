@@ -47,6 +47,7 @@ class DecisionMaker(object):
         self._IO_WAIT_MAX = decisionmaker_config.io_wait_max
         self._CRITICAL_PERC = decisionmaker_config.critialStatePercentage
         self._READ_WRITE_DISTANCE_MIN = decisionmaker_config.read_write_distance_min
+        self._MIN_SCAN_RATIO = decisionmaker_config.min_scan_ratio
 
         logging.info('DecisionMaker started.')
 
@@ -95,7 +96,7 @@ class DecisionMaker(object):
         else:
             scanratio = scantsize /reads
 
-        if scanratio >= 3.0:
+        if scanratio >= self._MIN_SCAN_RATIO:
             tag = 's'
         else:
             if totalreqs!=0:
