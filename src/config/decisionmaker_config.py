@@ -26,4 +26,5 @@ io_wait_max = 20
 critialStatePercentage = 0.5
 read_write_distance_min = 0.4
 min_scan_ratio = 3.0
+
 cpu_idle_max = 90
